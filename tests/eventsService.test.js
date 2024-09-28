@@ -1,7 +1,7 @@
 const EventsService = require('../services/eventsService');
-const EventRepository = require('../repositories/eventsRepository');
+const EventsRepository = require('../repositories/eventsRepository');
 
-jest.mock('../repositories/eventsRepository'); // Mock the EventRepository
+jest.mock('../repositories/eventsRepository'); // Mock the EventsRepository
 
 describe('EventsService', () => {
     // Sample data for testing
@@ -24,49 +24,49 @@ describe('EventsService', () => {
 
     test('should create an event', async () => {
         const eventData = { sampleEvent };
-        EventRepository.CreateAsync.mockResolvedValue(eventData); // Mock the Create method
+        EventsRepository.CreateAsync.mockResolvedValue(eventData); // Mock the Create method
 
         const result = await EventsService.CreateEventAsync(eventData);
         expect(result).toEqual(eventData); // Assert the result matches the input data
-        expect(EventRepository.CreateAsync).toHaveBeenCalledWith(eventData); // Ensure the repository method was called correctly
+        expect(EventsRepository.CreateAsync).toHaveBeenCalledWith(eventData); // Ensure the repository method was called correctly
     });
 
     test('should get an event by id', async () => {
         const eventId = sampleEvent.id;
         const eventData = { sampleEvent };
-        EventRepository.GetByIdAsync.mockResolvedValue(eventData); // Mock the GetById method
+        EventsRepository.GetByIdAsync.mockResolvedValue(eventData); // Mock the GetById method
 
         const result = await EventsService.GetEventByIdAsync(eventId);
         expect(result).toEqual(eventData); // Assert the returned data is correct
-        expect(EventRepository.GetByIdAsync).toHaveBeenCalledWith(eventId); // Check if the repository method was called correctly
+        expect(EventsRepository.GetByIdAsync).toHaveBeenCalledWith(eventId); // Check if the repository method was called correctly
     });
 
     test('should update an event', async () => {
         const eventId = sampleEvent.id;
         const updatedData = { eventName: 'Updated Event' };
         const updatedEvent = { ...sampleEvent, ...updatedData };
-        EventRepository.UpdateAsync.mockResolvedValue(updatedEvent); // Mock the Update method
+        EventsRepository.UpdateAsync.mockResolvedValue(updatedEvent); // Mock the Update method
 
         const result = await EventsService.UpdateEventAsync(eventId, updatedData);
         expect(result).toEqual(updatedEvent); // Assert the updated event is correct
-        expect(EventRepository.UpdateAsync).toHaveBeenCalledWith(eventId, updatedData); // Ensure the repository method was called correctly
+        expect(EventsRepository.UpdateAsync).toHaveBeenCalledWith(eventId, updatedData); // Ensure the repository method was called correctly
     });
 
     test('should delete an event', async () => {
         const eventId = sampleEvent.id;
-        EventRepository.Delete.mockResolvedValue(true); // Mock the Delete method
+        EventsRepository.DeleteAsync.mockResolvedValue(true); // Mock the Delete method
 
         const result = await EventsService.DeleteEventAsync(eventId);
         expect(result).toBe(true); // Assert the result indicates success
-        expect(EventRepository.DeleteAsync).toHaveBeenCalledWith(eventId); // Ensure the repository method was called correctly
+        expect(EventsRepository.DeleteAsync).toHaveBeenCalledWith(eventId); // Ensure the repository method was called correctly
     });
 
     test('should list all events', async () => {
         const events = [sampleEvent];
-        EventRepository.ListAllAsync.mockResolvedValue(events); // Mock the ListAll method
+        EventsRepository.ListAllAsync.mockResolvedValue(events); // Mock the ListAll method
 
         const result = await EventsService.ListAllEventsAsync();
         expect(result).toEqual(events); // Assert the returned events match the mock
-        expect(EventRepository.ListAllAsync).toHaveBeenCalled(); // Ensure the repository method was called
+        expect(EventsRepository.ListAllAsync).toHaveBeenCalled(); // Ensure the repository method was called
     });
 });
