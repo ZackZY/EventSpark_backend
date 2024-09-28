@@ -11,6 +11,9 @@ npx sequelize-cli db:migrate
 # to revert migration done to db
 npx sequelize-cli db:migrate:undo
 
+# running test
+npm test
+
 # Using Test Coverage
 npx jest --coverage
 
