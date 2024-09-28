@@ -1,0 +1,19 @@
+version: '3.8'  # Specify the Docker Compose version
+
+services:
+  mysql:
+    image: mysql:latest  # Use the latest MySQL image
+    container_name: eventspark_mysql  # Name of the container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Root password
+      MYSQL_DATABASE: EventSpark  # Create a database named EventSpark
+      MYSQL_USER: user  # Non-root user
+      MYSQL_PASSWORD: Userp@ssw0rd  # Password for the non-root user
+    ports:
+      - "3306:3306"  # Expose MySQL port
+    volumes:
+      - d:/mysql_data:/var/lib/mysql  # Persist data
+
+volumes:
+  mysql_data: 
+    driver: local # Define a volume to store MySQL data
