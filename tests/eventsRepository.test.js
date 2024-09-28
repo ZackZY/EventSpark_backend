@@ -30,7 +30,7 @@ describe('EventRepository', () => {
         // Mock the create method of Events model
         Events.create.mockResolvedValue(sampleEvent);
 
-        const result = await EventRepository.Create(sampleEvent);
+        const result = await EventRepository.CreateAsync(sampleEvent);
 
         // Assertions
         expect(Events.create).toHaveBeenCalledWith(sampleEvent);
@@ -41,7 +41,7 @@ describe('EventRepository', () => {
         // Mock the findByPk method of Events model
         Events.findByPk.mockResolvedValue(sampleEvent);
 
-        const result = await EventRepository.GetById(sampleEvent.id);
+        const result = await EventRepository.GetByIdAsync(sampleEvent.id);
 
         // Assertions
         expect(Events.findByPk).toHaveBeenCalledWith(sampleEvent.id);
@@ -55,7 +55,7 @@ describe('EventRepository', () => {
         // Mock the update method to return an array [numberOfAffectedRows, [updatedEvent]]
         Events.update.mockResolvedValue([1, [updatedEvent]]);
 
-        const result = await EventRepository.Update(sampleEvent.id, updatedData);
+        const result = await EventRepository.UpdateAsync(sampleEvent.id, updatedData);
 
         // Assertions
         expect(Events.update).toHaveBeenCalledWith(updatedData, {
@@ -69,7 +69,7 @@ describe('EventRepository', () => {
         // Mock the destroy method to return 1, indicating one row deleted
         Events.destroy.mockResolvedValue(1);
 
-        const result = await EventRepository.Delete(sampleEvent.id);
+        const result = await EventRepository.DeleteAsync(sampleEvent.id);
 
         // Assertions
         expect(Events.destroy).toHaveBeenCalledWith({ where: { id: sampleEvent.id } });
@@ -82,7 +82,7 @@ describe('EventRepository', () => {
         // Mock the findAll method to return an array of events
         Events.findAll.mockResolvedValue(eventsList);
 
-        const result = await EventRepository.ListAll();
+        const result = await EventRepository.ListAllAsync();
 
         // Assertions
         expect(Events.findAll).toHaveBeenCalled();
