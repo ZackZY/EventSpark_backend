@@ -1,25 +1,31 @@
-const {Events} = require('../db/models')
+const { Events } = require('../db/models')
 
-class EventRepository {
-    async Create(data){
-        
+class EventsRepository {
+    async CreateAsync(data){
+        return await Events.create(data);
     }
 
-    async GetById(eventId){
-        
+    async GetByIdAsync(eventId){
+        return await Events.findByPk(eventId);
     }
 
-    async Update(eventId, eventData){
+    async UpdateAsync(eventId, eventData){
+        const [rowsUpdated, [updatedEvent]] = await Events.update(eventData, {
+            where: {id:eventId},
+            returning : true
+        });
 
+        return rowsUpdated ? updatedEvent:null;
     }
 
-    async Delete(eventId){
-
+    async DeleteAsync(eventId){
+        const rowsDeleted = await Events.destroy({ where: { id:eventId }});
+        return rowsDeleted > 0;
     }
 
-    async ListAll() {
-
+    async ListAllAsync() {
+        return await Events.findAll({ where: {eventType:'Public'}});
     }
 }
 
-module.exports = new EventRepository();
+module.exports = new EventsRepository();

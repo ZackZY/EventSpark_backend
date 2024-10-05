@@ -1,3 +1,9 @@
+# to create new folder
+mkdir [folderName]
+
+# to create new file 
+> [filename]
+
 # to run docker for local database
 docker-compose up -d
 
@@ -17,3 +23,5 @@ npm test
 # Using Test Coverage
 npx jest --coverage
 
+# to start running application locally
+npm run local
