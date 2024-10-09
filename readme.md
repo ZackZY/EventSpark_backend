@@ -25,3 +25,18 @@ npx jest --coverage
 
 # to start running application locally
 npm run local
+
+# test payload to create event
+curl --request POST \
+  --url http://localhost:3000/events/events \
+  --header 'content-type: application/json' \
+  --data '{
+	"organiserId": "0e21f219-3279-4b6c-9519-6ac6065ade4b",
+	"eventName": "First Event",
+	"eventDescription": "First Event",
+	"eventDate": "2024-10-05",
+	"eventTimeStart": "2024-10-05 00:00:00+08:00",
+	"eventTimeEnd": "2024-10-06 00:00:00+08:00",
+	"eventLocation": "NCS HUB",
+	"eventType": "PUBLIC"
+}'
