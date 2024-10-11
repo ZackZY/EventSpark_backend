@@ -45,10 +45,14 @@ module.exports = (sequelize, DataTypes) => {
     });
   
     // Define any associations if required
-    //Events.associate = (models) => {
-      // Example association: If Events belongs to an Organizer
-      // Events.belongsTo(models.Organizer, { foreignKey: 'organiserId' });
-    //};
+    Events.associate = (models) => {
+      //Example association: through junction table
+      Events.belongsToMany(models.Attendees, { 
+        through: models.EventAttendees,
+        foreignKey: 'eventId',
+        otherKey: 'attendeeId',
+      });
+    };
   
     return Events;
   };
