@@ -1,7 +1,7 @@
 // models/attendee.js
 
 module.exports = (sequelize, DataTypes) => {
-    const Attendees = sequelize.define('Attendees', {
+    const User = sequelize.define('Users', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4, // Use UUIDV4 for default UUID generation
@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
     }, {
-      tableName: 'Attendees',  // Optional: Set table name explicitly if needed
+      tableName: 'Users',  // Optional: Set table name explicitly if needed
       timestamps: true,     // Adds createdAt and updatedAt fields automatically
     });
   

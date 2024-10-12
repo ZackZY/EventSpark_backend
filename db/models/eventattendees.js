@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       attendeeId: {
         type: DataTypes.UUID,
         references:{
-          model: 'Attendees',
+          model: 'User',
           key: 'id'
         },
         primaryKey: true,
@@ -33,11 +33,16 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'invited',
+        defaultValue: 'invited', // invited or registered or attended
       },
       eventAttendeeHash: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      typeOfAttendee: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'attendee', // attendee or organiser
       },
     }, {
       tableName: 'EventAttendees',  // Optional: Set table name explicitly if needed
