@@ -1,7 +1,7 @@
 // models/attendee.js
 
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('Users', {
+    const Users = sequelize.define('Users', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4, // Use UUIDV4 for default UUID generation
@@ -17,15 +17,15 @@ module.exports = (sequelize, DataTypes) => {
     });
   
     // Define any associations if required
-    Attendees.associate = (models) => {
+    Users.associate = (models) => {
       // Example association: If Events belongs to an Organizer
-      Attendees.belongsToMany(models.Events, { 
+      Users.belongsToMany(models.Events, { 
         through: models.EventAttendees,
         foreignKey: 'attendeeId',
         otherKey: 'eventId', 
     });
     };
   
-    return Attendees;
+    return Users;
   };
   

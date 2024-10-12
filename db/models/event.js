@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
     // Define any associations if required
     Events.associate = (models) => {
       //Example association: through junction table
-      Events.belongsToMany(models.Attendees, { 
+      Events.belongsToMany(models.Users, { 
         through: models.EventAttendees,
         foreignKey: 'eventId',
         otherKey: 'attendeeId',

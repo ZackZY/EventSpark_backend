@@ -28,15 +28,15 @@ npm run local
 
 # test payload to create event
 curl --request POST \
-  --url http://localhost:3000/events/events \
+  --url http://localhost:3001/events/events \
   --header 'content-type: application/json' \
   --data '{
-	"organiserId": "0e21f219-3279-4b6c-9519-6ac6065ade4b",
-	"eventName": "First Event",
-	"eventDescription": "First Event",
-	"eventDate": "2024-10-05",
-	"eventTimeStart": "2024-10-05 00:00:00+08:00",
-	"eventTimeEnd": "2024-10-06 00:00:00+08:00",
-	"eventLocation": "NCS HUB",
-	"eventType": "PUBLIC"
-}'
+    "organiserId": "e1a44ded-9cca-4d4c-93cd-6e60a707e149",
+    "eventName": "Second Event",
+    "eventDescription": "Second Event",
+    "eventDate": "2024-10-12",
+    "eventTimeStart": "2025-10-05 00:00:00+08:00",
+    "eventTimeEnd": "2025-10-06 00:00:00+08:00",
+    "eventLocation": "NCS HUB",
+    "eventType": "PUBLIC"
+  }'
