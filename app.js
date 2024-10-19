@@ -2,7 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-// const userRoutes = require('./routes/userRoutes');
+const userRoutes = require('./routes/usersRoutes');
 const eventRoutes = require('./routes/eventsRoutes');
 const logger = require('./utils/logger');
 const app = express();
@@ -11,7 +11,7 @@ const app = express();
 app.use(bodyParser.json()); // Parse JSON request bodies
 
 // Use the routes
-// app.use(userRoutes);
+app.use(userRoutes);
 app.use(eventRoutes);
 
 // Root route
