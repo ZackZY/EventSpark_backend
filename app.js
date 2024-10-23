@@ -5,7 +5,11 @@ const bodyParser = require('body-parser');
 // const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventsRoutes');
 const logger = require('./utils/logger');
+const cors = require('cors');
 const app = express();
+
+app.use(cors()); // temporarily allow all origins by default, need to add CORS to allow only frontend
+
 
 // Middleware
 app.use(bodyParser.json()); // Parse JSON request bodies
