@@ -12,7 +12,7 @@ services:
     ports:
       - "3306:3306"  # Expose MySQL port
     volumes:
-      - c:/mysql_data:/var/lib/mysql  # Persist data
+      - d:/mysql_data:/var/lib/mysql  # Persist data
 
 volumes:
   mysql_data: 
