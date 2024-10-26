@@ -34,9 +34,11 @@ jobs:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     - name: Debug encoded DATABASE_URL
-      run: echo "$(env.encoded_url)"
+      env:
+        ENCODED_URL: ${{ env.encoded_url }}
+      run: echo $ENCODED_URL
 
     - name: Run Sequelize migrations
       env:
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      run: npx sequelize-cli db:migrate --url ${{ env.encoded_url }}
+        ENCODED_URL: ${{ env.encoded_url }}
+      run: npx sequelize-cli db:migrate --url $ENCODED_URL
