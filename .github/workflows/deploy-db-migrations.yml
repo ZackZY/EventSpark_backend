@@ -29,7 +29,7 @@ jobs:
 
     - name: Encode DATABASE_URL
       id: encode_url
-      run: echo "encoded_url=$(echo $DATABASE_URL | jq -sRr @uri)" >> $GITHUB_ENV
+      run: echo "encoded_url=$(echo -n $DATABASE_URL | jq -sRr @uri)" >> $GITHUB_ENV
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
