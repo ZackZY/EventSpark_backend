@@ -1,4 +1,4 @@
-// models/attendee.js
+// models/user.js
 
 module.exports = (sequelize, DataTypes) => {
     const Users = sequelize.define('Users', {
@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4, // Use UUIDV4 for default UUID generation
         primaryKey: true,
+      },
+      attendeeName: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       attendeeEmail: {
         type: DataTypes.STRING,
