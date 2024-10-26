@@ -35,8 +35,8 @@ jobs:
 
     - name: Debug encoded DATABASE_URL
       env:
-        ENCODED_URL: ${{ env.encoded_url }}
-      run: echo $ENCODED_URL
+        ENCODED_URL: ${{ env.encoded_url }} 
+      run: echo $ENCODED_URL | sed 's/./& /g'
 
     - name: Run Sequelize migrations
       env:
