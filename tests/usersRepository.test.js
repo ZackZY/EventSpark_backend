@@ -82,4 +82,15 @@ describe('UsersRepository', () => {
         expect(Users.findAll).toHaveBeenCalled();
         expect(result).toEqual(usersList);
     });
+
+    test('should find an user by EMAIL', async () => {
+        // Mock the findByPk method of Users model
+        Users.findOne.mockResolvedValue(sampleUser);
+
+        const result = await UsersRepository.findByEmail(sampleUser.attendeeEmail);
+
+        // Assertions
+        expect(Users.findOne).toHaveBeenCalledWith(sampleUser.attendeeEmail);
+        expect(result).toEqual(sampleUser);
+    });
 });

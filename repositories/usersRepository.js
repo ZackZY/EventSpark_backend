@@ -26,6 +26,22 @@ class UsersRepository {
     async ListAllAsync() {
         return await Users.findAll({});
     }
+
+    // Find an attendee by email
+   async findByEmail(email) {
+    return await Users.findOne({ where: { email } });
+   }
+
+   // Find or create an attendee by email
+    async findOrCreateByEmail(attendeeData, transaction) {
+    return await Users.findOrCreate({
+      where: { attendeeEmail: attendeeData.attendeeEmail },
+      defaults: {
+        attendeeName: attendeeData.attendeeName || '' // provide a name if available
+      },
+      transaction
+    });
+  }
 }
 
 module.exports = new UsersRepository();

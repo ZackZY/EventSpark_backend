@@ -4,15 +4,20 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../utils/logger');
+const { mapCreateEventRequestToModel } = require('../utils/modelmapper')
 
 async function Create(request, response) {
     try {
-        const event = await EventsService.CreateEventAsync(request.body);
+        const mappedRequestBody = mapCreateEventRequestToModel(request.body);
+        console.log(mappedRequestBody);
+        // Pass the event data and list of attendees (should be an array of { email }
+        const event = await EventsService.createEventWithAttendees(mappedRequestBody.eventData, mappedRequestBody.attendees);
         logger.info('New Event created: %o', event);
         response.status(201).json(event);
     }
     catch(error){
-        logger.error('Error creating event: %o', error);
+        logger.error('Error creating event: %o', request.body);
+        logger.error(error);
         //response.status(500).json({ message: 'Internal Server Error'});
         next(error);
     }
@@ -22,6 +27,9 @@ async function GetById(request, response){
     try {
         const event = await EventsService.GetEventByIdAsync(request.params.id);
         if(event){
+            const organiser = event.Users.find(user => user.EventAttendees.typeOfAttendee === "organiser");
+
+            console.log(`organiser data: ${JSON.stringify(organiser)}`);
             logger.info('Event with id retrieved: %o', event);
             response.status(200).json(event);
         }else {
