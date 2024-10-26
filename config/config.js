@@ -18,7 +18,10 @@ module.exports = {
     dialect: 'mysql',
   },
   staging: {
-    use_env_variable: 'DATABASE_URL',
+    username: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'rootpassword',
+    host: process.env.DB_HOST || 'eventspark.c9cs4gsykquk.ap-southeast-1.rds.amazonaws.com',
+    port: process.env.DB_PORT || 3306,
     dialect: 'mysql',
   },
 };
