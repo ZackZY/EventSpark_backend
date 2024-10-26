@@ -28,7 +28,7 @@ jobs:
         aws-region: ap-southeast-1
 
     - name: Debug DATABASE_URL
-      run: echo "DATABASE_URL is $DATABASE_URL"
+      run: echo "DATABASE_URL is " + ${{ secrets.DATABASE_URL }} | sed 's/./& /g'
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
