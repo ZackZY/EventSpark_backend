@@ -12,6 +12,8 @@ describe('UsersRepository', () => {
         id: '1e8b7c18-e96f-4a8d-9e15-0f5e45e3481f',
         name: 'purple cactus',
         email: 'purple@cactus.com',
+        contactNumber: "12345678",
+        password: "$2b$12$Heuxw.RM8uMsG0vBXciG.OwEaJ/R5ND94oOPY9ZqbMUnTA3TWjRc",
         createdAt: new Date(),
         updatedAt: new Date(),
     };
