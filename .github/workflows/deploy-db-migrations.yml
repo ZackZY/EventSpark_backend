@@ -34,6 +34,5 @@ jobs:
 
     - name: Run Sequelize migrations
       env:
-        NODE_ENV: staging
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      run: npx sequelize-cli db:migrate
+      run: npx sequelize-cli db:migrate --url ${{ secrets.DATABASE_URL }}
