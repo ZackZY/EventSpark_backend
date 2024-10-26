@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { useInflection } = require('sequelize');
 
 module.exports = {
   development: {
@@ -18,11 +19,7 @@ module.exports = {
     dialect: 'mysql',
   },
   staging: {
-    username: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'rootpassword',
-    database: process.env.DB_NAME || 'EventSpark',
-    host: process.env.DB_HOST || 'eventspark.c9cs4gsykquk.ap-southeast-1.rds.amazonaws.com',
-    port: process.env.DB_PORT || 3306,
+    use_env_variable: 'DATABASE_URL',
     dialect: 'mysql',
   },
 };
