@@ -10,8 +10,8 @@ describe('UsersRepository', () => {
     // Sample data for testing
     const sampleUser = {
         id: '1e8b7c18-e96f-4a8d-9e15-0f5e45e3481f',
-        attendeeName: 'purple cactus',
-        attendeeEmail: 'purple@cactus.com',
+        name: 'purple cactus',
+        email: 'purple@cactus.com',
         createdAt: new Date(),
         updatedAt: new Date(),
     };
