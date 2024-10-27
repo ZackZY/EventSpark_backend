@@ -35,8 +35,13 @@ curl --request POST \
     "eventName": "Second Event",
     "eventDescription": "Second Event",
     "eventDate": "2024-10-12",
-    "eventTimeStart": "2025-10-05 00:00:00+08:00",
-    "eventTimeEnd": "2025-10-06 00:00:00+08:00",
+    "eventTimeStart": "18:00",
+    "eventTimeEnd": "20:30:",
     "eventLocation": "NCS HUB",
-    "eventType": "PUBLIC"
+    "eventType": "PUBLIC",
+    "attendees": [
+    { "email": "john.doe@example.com" },
+    { "email": "jane.smith@example.com" },
+    { "email": "alice.johnson@example.com" }
+  ]
   }'

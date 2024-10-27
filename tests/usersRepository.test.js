@@ -84,4 +84,63 @@ describe('UsersRepository', () => {
         expect(Users.findAll).toHaveBeenCalled();
         expect(result).toEqual(usersList);
     });
+
+    test('should find an user by EMAIL', async () => {
+        // Define sample data for the test
+        const email = 'purple@cactus.com';
+
+        // Mock findOne to return the sample user
+        Users.findOne.mockResolvedValue(sampleUser);
+
+        // Call the method
+        const result = await UsersRepository.findByEmail(email);
+
+        // Assertions
+        expect(Users.findOne).toHaveBeenCalledWith({ where: { email } });
+        expect(result).toEqual(sampleUser);
+        expect(result.email).toBe(email);
+    });
+
+    test('findOrCreateByEmail should return the existing user if a user with the given email already exists', async () =>{
+        // Sample input and expected output data
+      const attendeeData = { email: 'existing@example.com', name: 'Existing User' };
+      const transaction = {}; // Mock transaction object
+      const existingUser = [{ id: 'user-uuid', email: attendeeData.email, name: attendeeData.name }, false];
+
+      // Mock findOrCreate to simulate finding an existing user
+      Users.findOrCreate.mockResolvedValue(existingUser);
+
+      // Call the method
+      const result = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
+
+      // Assertions
+      expect(Users.findOrCreate).toHaveBeenCalledWith({
+        where: { email: attendeeData.email },
+        defaults: { name: attendeeData.name },
+        transaction,
+      });
+      expect(result).toEqual(existingUser);
+      expect(result[1]).toBe(false);
+    });
+
+    test('findOrCreateByEmail should create a new user if no user with the given email exists', async () => {
+        const attendeeData = { email: 'new@example.com', name: 'New User' };
+        const transaction = {}; // Mock transaction object
+        const newUser = [{ id: 'new-user-uuid', email: attendeeData.email, name: attendeeData.name }, true];
+
+        // Mock findOrCreate to simulate creating a new user
+        Users.findOrCreate.mockResolvedValue(newUser);
+        
+        // Call the method
+        const result = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
+
+        // Assertions
+        expect(Users.findOrCreate).toHaveBeenCalledWith({
+          where: { email: attendeeData.email },
+          defaults: { name: attendeeData.name },
+          transaction,
+        });
+        expect(result).toEqual(newUser);
+        expect(result[1]).toBe(true); 
+    });
 });

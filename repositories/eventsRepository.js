@@ -1,8 +1,9 @@
-const { Events } = require('../db/models')
+const { Events, Users } = require('../db/models')
 
 class EventsRepository {
-    async CreateAsync(data){
-        return await Events.create(data);
+    async CreateAsync(data, transaction){
+        console.log(`Create new event`);
+        return await Events.create(data,{ transaction });
     }
 
     async GetByIdAsync(eventId){
@@ -25,6 +26,12 @@ class EventsRepository {
 
     async ListAllAsync() {
         return await Events.findAll({ where: {eventType:'Public'}});
+    }
+
+    async GetEventWithAttendeesAsync(eventId){
+        return await Events.findByPk(eventId, {
+            include: Users,
+        })
     }
 }
 
