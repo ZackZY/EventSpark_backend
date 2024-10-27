@@ -47,17 +47,8 @@ class EventsService {
             // add created or updated users to event
             await EventAttendeesRepository.addAttendeesToEvent(newEvent, userInstances, transaction);
 
-            // get Organiser Detail
-            const organiserDetails = await UsersRepository.GetByIdAsync(eventData.organiserId);
-            
-            // add organiser to event
-            //await EventAttendeesRepository.addOrganiserToEvent(newEvent, organiserDetails, transaction);
-
             await transaction.commit();
-            const createdEventWithAttendee = await EventsRepository.GetEventWithAttendees(newEvent.id);
-            
-            const organiser = createdEventWithAttendee.users.find(user => user.EventAttendees.typeOfAttendee === "organiser");
-
+            const createdEventWithAttendee = await EventsRepository.GetEventWithAttendeesAsync(newEvent.id);
             return createdEventWithAttendee;
         }
         catch(error){

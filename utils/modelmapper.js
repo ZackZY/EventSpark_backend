@@ -17,7 +17,6 @@ function mapCreateEventRequestToModel(requestBody) {
         eventType,
         attendees, 
     } = requestBody;
-    console.log("mapCreateEventRequestToModel");
     // Combine eventDate and eventTimeStart to form a DateTime for start
     const eventStartDateTime = new Date(`${eventDate}T${eventTimeStart}:00`);
     
@@ -28,10 +27,6 @@ function mapCreateEventRequestToModel(requestBody) {
     const eventStartDateTimeGMT8 = new Date(eventStartDateTime.getTime() + offset * 60 * 1000);
     const eventEndDateTimeGMT8 = new Date(eventEndDateTime.getTime() + offset * 60 * 1000);
 
-    console.log(eventDate);
-    console.log(eventTimeStart);
-    console.log(eventStartDateTimeGMT8.toISOString());
-    console.log(eventEndDateTimeGMT8);
     // Return the mapped data
     return {
         eventData: {

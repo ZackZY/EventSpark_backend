@@ -2,7 +2,7 @@ const { Events, Users } = require('../db/models')
 
 class EventsRepository {
     async CreateAsync(data, transaction){
-        console.log(`repository data: ${JSON.stringify(data)}`);
+        console.log(`Create new event`);
         return await Events.create(data,{ transaction });
     }
 

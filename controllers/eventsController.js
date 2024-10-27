@@ -9,7 +9,6 @@ const { mapCreateEventRequestToModel } = require('../utils/modelmapper')
 async function Create(request, response) {
     try {
         const mappedRequestBody = mapCreateEventRequestToModel(request.body);
-        console.log(mappedRequestBody);
         // Pass the event data and list of attendees (should be an array of { email }
         const event = await EventsService.createEventWithAttendees(mappedRequestBody.eventData, mappedRequestBody.attendees);
         logger.info('New Event created: %o', event);
@@ -29,7 +28,6 @@ async function GetById(request, response){
         if(event){
             const organiser = event.Users.find(user => user.EventAttendees.typeOfAttendee === "organiser");
 
-            console.log(`organiser data: ${JSON.stringify(organiser)}`);
             logger.info('Event with id retrieved: %o', event);
             response.status(200).json(event);
         }else {

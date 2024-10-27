@@ -34,14 +34,15 @@ class UsersRepository {
 
    // Find or create an attendee by email
     async findOrCreateByEmail(attendeeData, transaction) {
-    return await Users.findOrCreate({
-      where: { attendeeEmail: attendeeData.attendeeEmail },
-      defaults: {
-        attendeeName: attendeeData.attendeeName || '' // provide a name if available
-      },
-      transaction
-    });
-  }
+        console.log(`Find or create new users`);
+        return await Users.findOrCreate({
+            where: { attendeeEmail: attendeeData.attendeeEmail },
+            defaults: {
+                attendeeName: attendeeData.attendeeName || '' // provide a name if available
+            },
+            transaction
+        });
+    }
 }
 
 module.exports = new UsersRepository();
