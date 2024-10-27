@@ -36,9 +36,9 @@ class UsersRepository {
     async findOrCreateByEmail(attendeeData, transaction) {
         console.log(`Find or create new users`);
         return await Users.findOrCreate({
-            where: { attendeeEmail: attendeeData.attendeeEmail },
+            where: { email: attendeeData.email },
             defaults: {
-                attendeeName: attendeeData.attendeeName || '' // provide a name if available
+                name: attendeeData.name || '' // provide a name if available
             },
             transaction
         });

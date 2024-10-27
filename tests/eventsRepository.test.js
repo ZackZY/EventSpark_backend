@@ -1,6 +1,7 @@
 // tests/EventsRepository.test.js
 
 const Events = require('../db/models').Events; // Assuming your Sequelize index file exports the models
+const Users = require('../db/models').Users;
 const EventsRepository = require('../repositories/eventsRepository');
 
 // Mock the Events model using Jest
@@ -22,6 +23,11 @@ describe('EventsRepository', () => {
         updatedAt: new Date(),
     };
 
+    const mockTransaction = {
+        commit: jest.fn(),
+        rollback: jest.fn(),
+    };
+
     beforeEach(() => {
         jest.clearAllMocks(); // Clear mock history before each test
     });
@@ -29,11 +35,12 @@ describe('EventsRepository', () => {
     test('should create a new event successfully', async () => {
         // Mock the create method of Events model
         Events.create.mockResolvedValue(sampleEvent);
+        // Events.create = jest.fn().mockResolvedValue(sampleEvent);
 
-        const result = await EventsRepository.CreateAsync(sampleEvent);
+        const result = await EventsRepository.CreateAsync(sampleEvent,mockTransaction);
 
         // Assertions
-        expect(Events.create).toHaveBeenCalledWith(sampleEvent);
+        expect(Events.create).toHaveBeenCalledWith(sampleEvent, { transaction: mockTransaction});
         expect(result).toEqual(sampleEvent);
     });
 
@@ -87,5 +94,38 @@ describe('EventsRepository', () => {
         // Assertions
         expect(Events.findAll).toHaveBeenCalled();
         expect(result).toEqual(eventsList);
+    });
+
+    test('GetEventWithAttendeesAsync should get event with Users', async() => {
+        const eventId = '1e8b7c18-e96f-4a8d-9e15-0f5e45e3481f';
+        const sampleEvent = {
+            id: eventId,
+            organiserId: 'd8e3f4e5-4b58-4a65-b37c-8f8fe2ad9a2a',
+            eventName: 'Tech Conference',
+            eventDescription: 'A conference for tech enthusiasts.',
+            eventDate: '2024-10-01',
+            eventTimeStart: new Date('2024-10-01T09:00:00'),
+            eventTimeEnd: new Date('2024-10-01T17:00:00'),
+            eventLocation: 'San Francisco, CA',
+            eventType: 'Conference',
+            Users: [
+              { id: 'user-uuid-1', name: 'John', contactNumber: 'Doe', email: 'john.doe@example.com' },
+              { id: 'user-uuid-2', name: 'Jane', contactNumber: 'Doe', email: 'jane.doe@example.com' },
+            ]
+        };
+
+        // Mock findByPk to return sample event with associated users
+        Events.findByPk.mockResolvedValue(sampleEvent);
+
+        // Call the method
+        const result = await EventsRepository.GetEventWithAttendeesAsync(eventId);
+        // Assertions
+        expect(Events.findByPk).toHaveBeenCalledWith(eventId, {
+            include: Users,
+        });
+        expect(result).toEqual(sampleEvent);
+        expect(result.Users).toHaveLength(2); // Check that it includes 2 associated users
+        expect(result.Users[0].name).toBe('John');
+        expect(result.Users[1].name).toBe('Jane');
     });
 });

@@ -26,8 +26,6 @@ async function GetById(request, response){
     try {
         const event = await EventsService.GetEventByIdAsync(request.params.id);
         if(event){
-            const organiser = event.Users.find(user => user.EventAttendees.typeOfAttendee === "organiser");
-
             logger.info('Event with id retrieved: %o', event);
             response.status(200).json(event);
         }else {

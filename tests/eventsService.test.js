@@ -34,11 +34,11 @@ describe('EventsService', () => {
     test('should get an event by id', async () => {
         const eventId = sampleEvent.id;
         const eventData = { sampleEvent };
-        EventsRepository.GetByIdAsync.mockResolvedValue(eventData); // Mock the GetById method
+        EventsRepository.GetEventWithAttendeesAsync.mockResolvedValue(eventData); // Mock the GetById method
 
         const result = await EventsService.GetEventByIdAsync(eventId);
         expect(result).toEqual(eventData); // Assert the returned data is correct
-        expect(EventsRepository.GetByIdAsync).toHaveBeenCalledWith(eventId); // Check if the repository method was called correctly
+        expect(EventsRepository.GetEventWithAttendeesAsync).toHaveBeenCalledWith(eventId); // Check if the repository method was called correctly
     });
 
     test('should update an event', async () => {

@@ -35,10 +35,10 @@ class EventsService {
                 attendeesData.map(async (attendeeData) => {
                     const [user, created] = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
                     if(created){
-                        console.log(`New user added: ${user.attendeeEmail}`);
+                        console.log(`New user added: ${user.email}`);
                     }
                     else{
-                        console.log(`Existing user: ${user.attendeeEmail}`);
+                        console.log(`Existing user: ${user.email}`);
                     }
                     return user;
                 })
