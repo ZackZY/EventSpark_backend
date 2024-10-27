@@ -7,13 +7,21 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4, // Use UUIDV4 for default UUID generation
         primaryKey: true,
       },
-      attendeeName: {
+      name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
-      attendeeEmail: {
+      email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+      },
+      contactNumber: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     }, {
       tableName: 'Users',  // Optional: Set table name explicitly if needed
