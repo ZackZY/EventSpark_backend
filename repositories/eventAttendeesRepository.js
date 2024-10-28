@@ -32,6 +32,10 @@ class EventAttendeesRepository {
           dateTimeAttended: null,
       });
       await EventAttendees.bulkCreate(attendeeEntries, { transaction });
+    };
+
+    async getAttendeesByEventId(eventId) {
+        return await EventAttendees.findAll({ where: { eventId } });
     }
 }
 

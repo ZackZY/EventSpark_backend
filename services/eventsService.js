@@ -2,6 +2,9 @@ const { sequelize } = require('../db/models');
 const EventsRepository = require('../repositories/eventsRepository');
 const UsersRepository = require('../repositories/usersRepository');
 const EventAttendeesRepository = require('../repositories/eventAttendeesRepository');
+const EmailService = require('./emailService');
+const EventObserver = require('./eventObserver');
+const eventObserver = require('./observers/eventObserver');
 
 class EventsService {
     async CreateEventAsync(data) {
@@ -48,7 +51,13 @@ class EventsService {
             await EventAttendeesRepository.addAttendeesToEvent(newEvent, userInstances, transaction);
 
             await transaction.commit();
+            // if events successfully created, send invite to all attendees using EventObserver
+            eventObserver.notify(newEvent);
+
             const createdEventWithAttendee = await EventsRepository.GetEventWithAttendeesAsync(newEvent.id);
+            // get all emails from Attendees
+            // get all event Hash
+            // const textBody = `https://ecs-frontend-lb-735742951.ap-southeast-1.elb.amazonaws.com/registerform.html?eventhash=${}`;
             return createdEventWithAttendee;
         }
         catch(error){
