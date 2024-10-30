@@ -2,34 +2,53 @@ const { Users } = require('../db/models');
 const logger = require('../utils/logger');
 
 class UsersRepository {
-    async CreateAsync(data){
-        return await Users.create(data);
+  async CreateAsync(data) {
+    return await Users.create(data);
+  }
+
+  async GetByIdAsync(userId) {
+    return await Users.findByPk(userId);
+  }
+
+  async UpdateAsync(userId, userData) {
+    console.log(userId, userData);
+
+    try {
+      // Perform the update without returning the updated record
+      const [rowsUpdated] = await Users.update(userData, {
+        where: { id: userId },
+      });
+
+      console.log("Rows updated:", rowsUpdated);
+
+      // Check if any rows were updated
+      if (rowsUpdated === 0) {
+        return null; // User not found
+      }
+
+      // Fetch the updated user record
+      const updatedUser = await Users.findOne({
+        where: { id: userId },
+      });
+
+      return updatedUser; // Return the updated user
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error; // Rethrow or handle the error as needed
     }
+  }
 
-    async GetByIdAsync(userId){
-        return await Users.findByPk(userId);
-    }
+  async DeleteAsync(userId) {
+    const rowsDeleted = await Users.destroy({ where: { id: userId } });
+    return rowsDeleted > 0;
+  }
 
-    async UpdateAsync(userId, userData){
-        const [rowsUpdated, [updatedEvent]] = await Users.update(userData, {
-            where: {id:userId},
-            returning : true
-        });
+  async ListAllAsync() {
+    return await Users.findAll({});
+  }
 
-        return rowsUpdated ? updatedEvent:null;
-    }
-
-    async DeleteAsync(userId){
-        const rowsDeleted = await Users.destroy({ where: { id:userId }});
-        return rowsDeleted > 0;
-    }
-
-    async ListAllAsync() {
-        return await Users.findAll({});
-    }
-
-    // Find an attendee by email
-   async findByEmail(email) {
+  // Find an attendee by email
+  async findByEmail(email) {
     return await Users.findOne({ where: { email } });
    }
 
