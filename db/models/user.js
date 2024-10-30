@@ -1,7 +1,9 @@
 // models/user.js
 
 module.exports = (sequelize, DataTypes) => {
-    const Users = sequelize.define('Users', {
+  const Users = sequelize.define(
+    "Users",
+    {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4, // Use UUIDV4 for default UUID generation
@@ -10,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      isAdmin: {
+        type: DataTypes.TINYINT,
+        allowNull: false,
       },
       email: {
         type: DataTypes.STRING,
@@ -23,21 +29,22 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-    }, {
-      tableName: 'Users',  // Optional: Set table name explicitly if needed
-      timestamps: true,     // Adds createdAt and updatedAt fields automatically
+    },
+    {
+      tableName: "Users", // Optional: Set table name explicitly if needed
+      timestamps: true, // Adds createdAt and updatedAt fields automatically
+    }
+  );
+
+  // Define any associations if required
+  Users.associate = (models) => {
+    // Example association: If Events belongs to an Organizer
+    Users.belongsToMany(models.Events, {
+      through: models.EventAttendees,
+      foreignKey: "attendeeId",
+      otherKey: "eventId",
     });
-  
-    // Define any associations if required
-    Users.associate = (models) => {
-      // Example association: If Events belongs to an Organizer
-      Users.belongsToMany(models.Events, { 
-        through: models.EventAttendees,
-        foreignKey: 'attendeeId',
-        otherKey: 'eventId', 
-    });
-    };
-  
-    return Users;
   };
-  
+
+  return Users;
+};
