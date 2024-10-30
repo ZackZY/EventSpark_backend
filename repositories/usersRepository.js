@@ -1,4 +1,5 @@
-const { Users } = require('../db/models')
+const { Users } = require('../db/models');
+const logger = require('../utils/logger');
 
 class UsersRepository {
     async CreateAsync(data){
@@ -34,7 +35,7 @@ class UsersRepository {
 
    // Find or create an attendee by email
     async findOrCreateByEmail(attendeeData, transaction) {
-        console.log(`Find or create new users`);
+        logger.info(`Find or create new users`);
         return await Users.findOrCreate({
             where: { email: attendeeData.email },
             defaults: {
