@@ -1,8 +1,9 @@
-const { Events, Users } = require('../db/models')
+const { Events, Users } = require('../db/models');
+const logger = require('../utils/logger');
 
 class EventsRepository {
     async CreateAsync(data, transaction){
-        console.log(`Create new event`);
+        logger.info(`Create new event`);
         return await Events.create(data,{ transaction });
     }
 

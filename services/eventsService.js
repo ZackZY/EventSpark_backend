@@ -2,6 +2,8 @@ const { sequelize } = require('../db/models');
 const EventsRepository = require('../repositories/eventsRepository');
 const UsersRepository = require('../repositories/usersRepository');
 const EventAttendeesRepository = require('../repositories/eventAttendeesRepository');
+const eventObserver = require('./observers/eventObserver');
+const logger = require('../utils/logger');
 
 class EventsService {
     async CreateEventAsync(data) {
@@ -35,10 +37,10 @@ class EventsService {
                 attendeesData.map(async (attendeeData) => {
                     const [user, created] = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
                     if(created){
-                        console.log(`New user added: ${user.email}`);
+                        logger.info(`New user added: ${user.email}`);
                     }
                     else{
-                        console.log(`Existing user: ${user.email}`);
+                        logger.info(`Existing user: ${user.email}`);
                     }
                     return user;
                 })
@@ -48,10 +50,45 @@ class EventsService {
             await EventAttendeesRepository.addAttendeesToEvent(newEvent, userInstances, transaction);
 
             await transaction.commit();
+            // if events successfully created, send invite to all attendees using EventObserver
+            eventObserver.notify(newEvent);
+
             const createdEventWithAttendee = await EventsRepository.GetEventWithAttendeesAsync(newEvent.id);
+            // get all emails from Attendees
+            // get all event Hash
+            // const textBody = `https://ecs-frontend-lb-735742951.ap-southeast-1.elb.amazonaws.com/registerform.html?eventhash=${}`;
             return createdEventWithAttendee;
         }
         catch(error){
+            await transaction.rollback();
+            throw error;
+        }
+    }
+
+    async addAttendeesToEvent(eventId, attendeesData) {
+        const transaction = await sequelize.transaction();
+        try{
+            const event = await EventsRepository.GetByIdAsync(eventId);
+            const userInstances = await Promise.all(
+                attendeesData.map(async (attendeeData) => {
+                    const [user, created] = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
+                    if(created){
+                        logger.info(`New user added: ${user.email}`);
+                    }
+                    else{
+                        logger.info(`Existing user: ${user.email}`);
+                    }
+                    return user;
+                })
+            );
+
+            // add created or updated users to event
+            await EventAttendeesRepository.addAttendeesToEvent(event, userInstances, transaction);
+            await transaction.commit();
+
+            // if events successfully created, send invite to all attendees using EventObserver
+            eventObserver.notify(event);
+        }catch(error){
             await transaction.rollback();
             throw error;
         }

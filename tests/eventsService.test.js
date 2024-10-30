@@ -1,7 +1,14 @@
 const EventsService = require('../services/eventsService');
 const EventsRepository = require('../repositories/eventsRepository');
+const UsersRepository = require('../repositories/usersRepository');
+const EventAttendeesRepository = require('../repositories/eventAttendeesRepository');
+const eventObserver = require('../services/observers/eventObserver');
+const sequelize = require('../db/models/index').sequelize;
 
 jest.mock('../repositories/eventsRepository'); // Mock the EventsRepository
+jest.mock('../repositories/usersRepository'); // Mock the UsersRepository
+jest.mock('../repositories/eventAttendeesRepository') // mock the EventAttendeesRepository
+jest.mock('../services/observers/eventObserver');
 
 describe('EventsService', () => {
     // Sample data for testing
@@ -20,6 +27,13 @@ describe('EventsService', () => {
     };
     beforeEach(() => {
         jest.clearAllMocks(); // Clear previous calls and instances
+
+        mockTransaction = {
+            commit: jest.fn(),
+            rollback: jest.fn(),
+        };
+
+        sequelize.transaction = jest.fn().mockResolvedValue(mockTransaction);
     });
 
     test('should create an event', async () => {
@@ -68,5 +82,90 @@ describe('EventsService', () => {
         const result = await EventsService.ListAllEventsAsync();
         expect(result).toEqual(events); // Assert the returned events match the mock
         expect(EventsRepository.ListAllAsync).toHaveBeenCalled(); // Ensure the repository method was called
+    });
+
+    test('should create an event with attendees', async () => {
+
+        const eventData = {
+            eventName: 'Test Event',
+            eventDescription: 'This is a test event',
+            eventDate: '2024-10-01',
+            eventTimeStart: new Date('2024-10-01T09:00:00'),
+            eventTimeEnd: new Date('2024-10-01T17:00:00'),
+            eventLocation: 'San Francisco, CA',
+            eventType: 'Conference',
+        };
+    
+        const attendeesData = [
+            { email: 'attendee1@example.com' },
+            { email: 'attendee2@example.com' },
+        ];
+    
+        // Mock EventsRepository.CreateAsync to return a sample event
+        EventsRepository.CreateAsync.mockResolvedValue(sampleEvent);
+    
+        // Mock UsersRepository.findOrCreateByEmail to return sample users
+        const sampleUsers = [
+            { id: 'user1', email: 'attendee1@example.com' },
+            { id: 'user2', email: 'attendee2@example.com' },
+        ];
+        UsersRepository.findOrCreateByEmail.mockResolvedValueOnce([sampleUsers[0], true]);
+        UsersRepository.findOrCreateByEmail.mockResolvedValueOnce([sampleUsers[1], true]);
+    
+        // Mock EventAttendeesRepository.addAttendeesToEvent to return successfully
+        EventAttendeesRepository.addAttendeesToEvent.mockResolvedValue();
+    
+        // Mock eventObserver.notify to return successfully
+        eventObserver.notify.mockResolvedValue();
+
+        EventsRepository.GetEventWithAttendeesAsync.mockResolvedValue(sampleEvent); // Mock the GetById method
+    
+        // Call the method
+        const result = await EventsService.createEventWithAttendees(eventData, attendeesData);
+    
+        // Assertions
+        expect(EventsRepository.CreateAsync).toHaveBeenCalledWith(eventData, mockTransaction);
+        expect(UsersRepository.findOrCreateByEmail).toHaveBeenCalledTimes(2);
+        expect(UsersRepository.findOrCreateByEmail).toHaveBeenCalledWith(attendeesData[0], mockTransaction);
+        expect(UsersRepository.findOrCreateByEmail).toHaveBeenCalledWith(attendeesData[1], mockTransaction);
+        expect(EventAttendeesRepository.addAttendeesToEvent).toHaveBeenCalledWith(sampleEvent, sampleUsers, mockTransaction);
+        expect(eventObserver.notify).toHaveBeenCalledWith(sampleEvent);
+        expect(result).toEqual(sampleEvent);
+    });
+
+    test('should add attendees to an event', async () => {
+        const eventId = sampleEvent.id;
+        const attendeesData = [
+            { email: 'attendee1@example.com' },
+            { email: 'attendee2@example.com' },
+        ];
+    
+        // Mock EventsRepository.GetByIdAsync to return a sample event
+        EventsRepository.GetByIdAsync.mockResolvedValue(sampleEvent);
+    
+        // Mock UsersRepository.findOrCreateByEmail to return sample users
+        const sampleUsers = [
+            { id: 'user1', email: 'attendee1@example.com' },
+            { id: 'user2', email: 'attendee2@example.com' },
+        ];
+        UsersRepository.findOrCreateByEmail.mockResolvedValueOnce([sampleUsers[0], true]);
+        UsersRepository.findOrCreateByEmail.mockResolvedValueOnce([sampleUsers[1], true]);
+    
+        // Mock EventAttendeesRepository.addAttendeesToEvent to return successfully
+        EventAttendeesRepository.addAttendeesToEvent.mockResolvedValue();
+    
+        // Mock eventObserver.notify to return successfully
+        eventObserver.notify.mockResolvedValue();
+    
+        // Call the method
+        await EventsService.addAttendeesToEvent(eventId, attendeesData);
+    
+        // Assertions
+        expect(EventsRepository.GetByIdAsync).toHaveBeenCalledWith(eventId);
+        expect(UsersRepository.findOrCreateByEmail).toHaveBeenCalledTimes(2);
+        expect(UsersRepository.findOrCreateByEmail).toHaveBeenCalledWith(attendeesData[0], mockTransaction);
+        expect(UsersRepository.findOrCreateByEmail).toHaveBeenCalledWith(attendeesData[1], mockTransaction);
+        expect(EventAttendeesRepository.addAttendeesToEvent).toHaveBeenCalledWith(sampleEvent, sampleUsers, mockTransaction);
+        expect(eventObserver.notify).toHaveBeenCalledWith(sampleEvent);
     });
 });
