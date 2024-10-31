@@ -1,5 +1,6 @@
 const { Users } = require('../db/models');
 const logger = require('../utils/logger');
+const { Events } = require('../db/models')
 
 class UsersRepository {
   async CreateAsync(data) {
@@ -62,6 +63,10 @@ class UsersRepository {
             },
             transaction
         });
+    }
+
+    async GetEventByUserIdAsync(userId){
+        return await Users.findByPk(userId, { include : Events });
     }
 }
 

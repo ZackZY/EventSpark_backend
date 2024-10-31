@@ -45,3 +45,12 @@ curl --request POST \
     { "email": "alice.johnson@example.com" }
   ]
   }'
+
+-- http://localhost:3001/events/events/newinvite/:id
+  {
+    "attendees" : [
+      { "email": "john.doe@example.com" },
+      { "email": "jane.smith@example.com" },
+      { "email": "alice.johnson@example.com" }
+    ]
+  }

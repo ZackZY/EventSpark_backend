@@ -11,7 +11,7 @@ class EventsService {
     }
 
     async GetEventByIdAsync(eventId){
-        return await EventsRepository.GetEventWithAttendeesAsync(eventId);
+        return await EventsRepository.GetByIdAsync(eventId);
     }
 
     async UpdateEventAsync(eventId, eventData){
@@ -65,7 +65,7 @@ class EventsService {
         }
     }
 
-    async addAttendeesToEvent(eventId, attendeesData) {
+    async AddAttendeesToEvent(eventId, attendeesData) {
         const transaction = await sequelize.transaction();
         try{
             const event = await EventsRepository.GetByIdAsync(eventId);
@@ -88,9 +88,26 @@ class EventsService {
 
             // if events successfully created, send invite to all attendees using EventObserver
             eventObserver.notify(event);
+            return userInstances.length();
+
         }catch(error){
             await transaction.rollback();
             throw error;
+        }
+    }
+
+    async GetEventByUserIdAsync(userId){
+        const results =  UsersRepository.GetEventByUserIdAsync(userId);
+        if(results){
+            const events = results.Events;
+            if(!events || events.length === 0){
+                logger.info(`No events found for user ${userId}`);
+            }
+            return events;
+        }
+        else{
+            logger.info(`No user found for ${userId}`);
+            return null;
         }
     }
 }
