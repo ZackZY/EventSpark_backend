@@ -1,10 +1,10 @@
-const EventsService = require('../services/eventsService')
+const EventsService = require('../services/eventsService');
 const express = require('express');
 // Create a new Router object
 const router = express.Router();
 const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../utils/logger');
-const { mapCreateEventRequestToModel } = require('../utils/modelmapper')
+const { mapCreateEventRequestToModel } = require('../utils/modelmapper');
 
 async function Create(request, response) {
     try {
@@ -96,12 +96,32 @@ async function ListAll(request, response, next){
     }
 }
 
+async function InviteUsersToEvent(request, response, next){
+    try{
+        const eventId = request.params.id;
+        const results = await EventsService.AddAttendeesToEvent(eventId, response.body);
+        if(results > 0){
+            logger.info(`${results} users invited`);
+            response.status(200).json(results);
+        }else{
+            logger.info(`${results}, no users invited`);
+            response.status(404).json({message: `No users invited`});
+        }
+
+    }catch(error){
+        logger.error(`Error inviting user ${error}`);
+        response.status(500).json({message: 'Internal Server Error'});
+        next(error);
+    }
+
+}
+
 // Connect the routes to the controller methods
 router.post('/events', asyncHandler(Create));           // Route for creating an event
 router.get('/events/:id', asyncHandler(GetById));        // Route for fetching an event by ID
 router.put('/events/:id', asyncHandler(Update));         // Route for updating an event by ID
 router.delete('/events/:id', asyncHandler(Delete));      // Route for deleting an event by ID
 router.get('/events', asyncHandler(ListAll));           // Route for listing all events
-
+router.put('/events/newinvite/:id', asyncHandler(InviteUsersToEvent)); // Route for invite user to event
 // Export the router
 module.exports = router;
