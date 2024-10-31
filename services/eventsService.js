@@ -95,6 +95,21 @@ class EventsService {
             throw error;
         }
     }
+
+    async GetEventByUserIdAsync(userId){
+        const results =  UsersRepository.GetEventByUserIdAsync(userId);
+        if(results){
+            const events = results.Events;
+            if(!events || events.length === 0){
+                logger.info(`No events found for user ${userId}`);
+            }
+            return events;
+        }
+        else{
+            logger.info(`No user found for ${userId}`);
+            return null;
+        }
+    }
 }
 
 module.exports = new EventsService();

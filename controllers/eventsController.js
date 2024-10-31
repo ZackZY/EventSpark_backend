@@ -116,6 +116,23 @@ async function InviteUsersToEvent(request, response, next){
 
 }
 
+async function GetEventByUserIdsync(request, response, next){
+    const userId = request.params.userId;
+    try {
+        const result = await EventsService.GetEventByUserIdAsync(userId);
+        if(result && result.length() > 0){
+            response.status(200).json(result);
+        }
+        else{
+            response.status(404).json({message: `No Events found for user`});
+        }
+    } catch (error) {
+        logger.error(`Error getting event for user: ${userId}`);
+        response.status(500).json({message: 'Internal Server Error'});
+        next(error);
+    }
+}
+
 // Connect the routes to the controller methods
 router.post('/events', asyncHandler(Create));           // Route for creating an event
 router.get('/events/:id', asyncHandler(GetById));        // Route for fetching an event by ID
@@ -123,5 +140,6 @@ router.put('/events/:id', asyncHandler(Update));         // Route for updating a
 router.delete('/events/:id', asyncHandler(Delete));      // Route for deleting an event by ID
 router.get('/events', asyncHandler(ListAll));           // Route for listing all events
 router.put('/events/newinvite/:id', asyncHandler(InviteUsersToEvent)); // Route for invite user to event
+router.get('/events/:userid', asyncHandler(GetEventByUserIdsync)); // Route for getting events by User Id
 // Export the router
 module.exports = router;
