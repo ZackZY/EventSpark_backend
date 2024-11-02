@@ -1,6 +1,15 @@
 const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
 const logger = require('../utils/logger');
-const ses = new SESClient({ region: 'ap-southeast-1' });
+// const path = require('path');
+// const env = process.env.NODE_ENV || 'development';
+// const config = require(path.join(__dirname, '../../config/config.json'))[env];
+const ses = new SESClient({ 
+    region: 'ap-southeast-1',  
+    credentials:{
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    }, 
+});
 
 class EmailService {
     async sendEmail(to, subject, textBody, htmlBody) {
