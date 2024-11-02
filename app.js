@@ -19,7 +19,7 @@ app.use(bodyParser.json()); // Parse JSON request bodies
 // Use the routes
 app.use(userRoutes);
 app.use(eventRoutes);
-//app.use(eventAttendeesRoutes);
+app.use(eventAttendeeRoutes);
 
 // Root route
 app.get('/', (req, res) => {
