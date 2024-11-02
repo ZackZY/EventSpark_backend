@@ -9,7 +9,8 @@ class EventAttendeesService {
     async RegisterAttendeeForEventAsync(eventId, userId){
         const transaction = await sequelize.transaction();
         try{
-            const result = EventAttendeesRepository.RegisterAttendeeForEventAsync(eventId, userId, transaction);
+            const result = EventAttendeesRepository.registerEvent(eventId, userId, transaction);
+            transaction.commit();
             if(result){
                 logger.info(`Register successful for ${eventId}-${userId}`);
                 const event = EventsService.GetEventByIdAsync(eventId);
@@ -22,8 +23,29 @@ class EventAttendeesService {
 
         }
         catch(error){
+            transaction.rollback();
             throw error;
         }
+    }
+
+    async GetAttendeesByEventId(eventId){
+        const results = await EventAttendeesRepository.getAttendeesByEventId(eventId);
+
+        const userPromises = results.map(async (attendee) => {
+            const { id,name,email,contactNumber } = await UsersService.GetUserByIdAsync(attendee.attendeeId);
+            return {
+                ...attendee.dataValues,
+                user: {
+                    id,
+                    name,
+                    email,
+                    contactNumber
+                }
+            };
+        });
+        const users = await Promise.all(userPromises);
+
+        return users;
     }
 }
 

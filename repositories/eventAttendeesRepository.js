@@ -74,6 +74,7 @@ class EventAttendeesRepository {
     async registerEvent(eventId, attendeeId, transaction){
       const [rowsUpdated] = await EventAttendees.update({
         dateTimeRegistered: new Date(),
+        status: 'registered',
       },{
         where:{
           attendeeId,
