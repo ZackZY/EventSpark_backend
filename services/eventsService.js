@@ -110,7 +110,7 @@ class EventsService {
     }
 
     async GetEventByUserIdAsync(userId){
-        const results =  UsersRepository.GetEventByUserIdAsync(userId);
+        const results = await UsersRepository.GetEventByUserIdAsync(userId);
         if(results){
             const events = results.Events;
             if(!events || events.length === 0){

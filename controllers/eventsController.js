@@ -117,10 +117,10 @@ async function InviteUsersToEvent(request, response, next){
 }
 
 async function GetEventByUserIdsync(request, response, next){
-    const userId = request.params.userId;
+    const userId = request.params.userid;
     try {
         const result = await EventsService.GetEventByUserIdAsync(userId);
-        if(result && result.length() > 0){
+        if(result && result.length > 0){
             response.status(200).json(result);
         }
         else{
