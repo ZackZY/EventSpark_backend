@@ -6,7 +6,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../utils/logger');
 const { mapCreateEventRequestToModel } = require('../utils/modelmapper');
 
-async function Create(request, response) {
+async function Create(request, response, next) {
     try {
         const mappedRequestBody = mapCreateEventRequestToModel(request.body);
         // Pass the event data and list of attendees (should be an array of { email }
@@ -22,7 +22,7 @@ async function Create(request, response) {
     }
 }
 
-async function GetById(request, response){
+async function GetById(request, response, next){
     try {
         const event = await EventsService.GetEventByIdAsync(request.params.id);
         if(event){

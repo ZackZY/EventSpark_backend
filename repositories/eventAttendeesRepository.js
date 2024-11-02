@@ -1,4 +1,4 @@
-const { EventAttendees } = require('../db/models');
+const { EventAttendees, Users } = require('../db/models');
 const logger = require('../utils/logger');
 
 class EventAttendeesRepository {

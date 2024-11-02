@@ -27,13 +27,16 @@ class EventsService {
     }
 
     async createEventWithAttendees(eventData, attendeesData){
+        // transaction to handle event and user creation
         const transaction = await sequelize.transaction();
+        let newEvent;
+        let userInstances;
         try{
             // create new event 1st
-            const newEvent = await EventsRepository.CreateAsync(eventData,transaction);
+            newEvent = await EventsRepository.CreateAsync(eventData,transaction);
             
             // find or create new user based on email 
-            const userInstances = await Promise.all(
+            userInstances = await Promise.all(
                 attendeesData.map(async (attendeeData) => {
                     const [user, created] = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
                     if(created){
@@ -45,14 +48,23 @@ class EventsService {
                     return user;
                 })
             );
-
-            // add created or updated users to event
-            await EventAttendeesRepository.addAttendeesToEvent(newEvent, userInstances, transaction);
-
             await transaction.commit();
+
+        }
+        catch(error){
+            await transaction.rollback();
+            throw error;
+        }
+        // transaction to handle adding user to event
+        const transaction2 = await sequelize.transaction();
+        try{
+            
+            // add created or updated users to event
+            await EventAttendeesRepository.addAttendeesToEvent(newEvent, userInstances, transaction2);
+            await transaction2.commit();
             // if events successfully created, send invite to all attendees using EventObserver
             eventObserver.notify(newEvent);
-
+            
             const createdEventWithAttendee = await EventsRepository.GetEventWithAttendeesAsync(newEvent.id);
             // get all emails from Attendees
             // get all event Hash
@@ -60,9 +72,10 @@ class EventsService {
             return createdEventWithAttendee;
         }
         catch(error){
-            await transaction.rollback();
+            await transaction2.rollback();
             throw error;
         }
+
     }
 
     async AddAttendeesToEvent(eventId, attendeesData) {

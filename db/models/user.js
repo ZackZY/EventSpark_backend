@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       isAdmin: {
         type: DataTypes.TINYINT,
         allowNull: false,
+        defaultValue: 0,
       },
       email: {
         type: DataTypes.STRING,
