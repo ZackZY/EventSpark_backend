@@ -140,6 +140,6 @@ router.put('/events/:id', asyncHandler(Update));         // Route for updating a
 router.delete('/events/:id', asyncHandler(Delete));      // Route for deleting an event by ID
 router.get('/events', asyncHandler(ListAll));           // Route for listing all events
 router.put('/events/newinvite/:id', asyncHandler(InviteUsersToEvent)); // Route for invite user to event
-router.get('/events/:userid', asyncHandler(GetEventByUserIdsync)); // Route for getting events by User Id
+router.get('/events/user/:userid', asyncHandler(GetEventByUserIdsync)); // Route for getting events by User Id
 // Export the router
 module.exports = router;
