@@ -32,7 +32,7 @@ async function RegisterForEvent(request,response, next){
        }
        // register for event
        await EventAttendeesService.RegisterAttendeeForEventAsync(eventId, updatedUser.id);
-
+      
         logger.info(`User registered: ${updatedUser.id} `);
         response.status(200).json({message : 'User registered'});
     }
