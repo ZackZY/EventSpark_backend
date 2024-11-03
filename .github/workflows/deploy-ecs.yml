@@ -89,9 +89,14 @@ jobs:
         REPOSITORY: backend
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build with NODE_ENV set to staging
+        # Build with all environment variables
         docker build \
           --build-arg NODE_ENV=staging \
+          --build-arg DB_USER=${{ env.DB_USER }} \
+          --build-arg DB_PASSWORD=${{ env.DB_PASSWORD }} \
+          --build-arg DB_NAME=${{ env.DB_NAME }} \
+          --build-arg DB_HOST=${{ env.DB_HOST }} \
+          --build-arg DB_PORT=${{ env.DB_PORT }} \
           -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
         docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
         echo "image=$REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
