@@ -9,8 +9,10 @@ const logger = require('./utils/logger');
 const cors = require('cors');
 const os = require('os');
 const app = express();
+require('dotenv').config();
 
-app.use(cors()); // temporarily allow all origins by default, need to add CORS to allow only frontend
+console.log(`CORS Origin: ${process.env.ORIGIN}`);
+app.use(cors({origin:process.env.ORIGIN, credentials: true})); // temporarily allow all origins by default, need to add CORS to allow only frontend
 
 
 // Middleware
