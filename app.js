@@ -7,8 +7,8 @@ const eventRoutes = require('./routes/eventsRoutes');
 const eventAttendeeRoutes = require('./routes/eventAttendeesRoutes');
 const logger = require('./utils/logger');
 const cors = require('cors');
+const os = require('os');
 const app = express();
-//const eventAttendeesRoutes = require('./routes/eventAttendeesRoutes');
 
 app.use(cors()); // temporarily allow all origins by default, need to add CORS to allow only frontend
 
@@ -46,8 +46,33 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Start the server
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+    // Get all network interfaces
+    const networkInterfaces = os.networkInterfaces();
+    
+    console.log('\n=================================');
+    console.log('🚀 Server is running on:');
+    console.log(`Local: http://localhost:${PORT}`);
+    
+    // List all available network interfaces
+    Object.keys(networkInterfaces).forEach((interfaceName) => {
+        networkInterfaces[interfaceName].forEach((interface) => {
+            // Skip internal and non-IPv4 addresses
+            if (!interface.internal && interface.family === 'IPv4') {
+                console.log(`Network (${interfaceName}): http://${interface.address}:${PORT}`);
+            }
+        });
+    });
+    console.log('=================================\n');
+
+    // Log to winston logger as well
+    logger.info('Server started', {
+        port: PORT,
+        host: HOST,
+        interfaces: networkInterfaces
+    });
 });
 
 // Export the app
