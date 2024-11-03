@@ -3,6 +3,7 @@ const logger = require("../../utils/logger");
 const emailService = require("../emailService");
 const qrcode = require('qrcode');
 const usersService = require("../usersService");
+const uploadService = require("../uploadService");
 
 // EventObserver.js
 class EventObserver {
@@ -47,29 +48,26 @@ class EventObserver {
       const eventAttendeeHash = await eventAttendeesRepository.getEventAttendeeHashAsync(event.id, attendee.id);
       if(eventAttendeeHash){
         logger.info(`Sending confirmation for ${eventAttendeeHash}`);
+        const qrCodeBuffer = await this.generateQrCodeAndSave(eventAttendeeHash);
+        
+        // upload to S3 and get image link
+        const imageLink = await uploadService.uploadQrCodeToS3(eventAttendeeHash, qrCodeBuffer);
+        logger.info(`QR Code URL: ${imageLink}`);
 
         const emailBody = `
           Please check in your attendance to ${event.eventName}
           We look forward to seeing you there!
-          <img src="cid:qrcode" alt="Event QR Code" />
+          <img src="${imageLink}" alt="Event QR Code" />
         `;
 
         const htmlEmailBody = `
           <p>Please check in your attendance to ${event.eventName}:</p>
           <p>We look forward to seeing you there!</p>
-          <img src="cid:qrcode" alt="Event QR Code" />
+          <img src="${imageLink}" alt="Event QR Code" />
         `;
-        const qrCodeBuffer = await this.generateQrCodeAndSave(eventAttendeeHash);
-        
-        logger.info(`QR Code URL: ${qrCodeBuffer}`);
-        const attachment = {
-          Content: qrCodeBuffer,
-          Name: 'QRCode.png',
-          ContentType: 'image/png',
-          ContentDisposition: 'inline',
-          ContentID: 'qrcode'
-        }
-        await emailService.sendEmail(attendee.email, 'Event Check In QR CODE', emailBody, htmlEmailBody, attachment);
+
+
+        await emailService.sendEmail(attendee.email, 'Event Check In QR CODE', emailBody, htmlEmailBody);
       }
     }
 
