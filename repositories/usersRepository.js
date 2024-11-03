@@ -60,7 +60,7 @@ class UsersRepository {
             where: { email: attendeeData.email },
             defaults: {
                 name: attendeeData.name || null, // provide a name if available
-                contactnumber: attendeeData.contactNumber || null
+                contactNumber: attendeeData.contactNumber || null
             },
             transaction
         });
