@@ -23,19 +23,19 @@ async function RegisterForEvent(request,response, next){
         */
        const eventId = request.params.id;
        // update the user details
-       const updatedUser = await UsersService.UpdateUserAsync(user.id, request.body);
+       const updatedUser = await UsersService.UpdateUserAsync(request.body.id, request.body);
 
        // register for event
        EventAttendeesService.RegisterAttendeeForEventAsync(eventId, updatedUser.id);
 
-       if(success){
+       // if(success){
             logger.info('User with id deleted: %o', success);
             response.status(200).json({message : 'User deleted'});
-        }
-        else {
-            logger.info('User with id not found: %o', request.params.id);
-            response.status(404).json({message: 'User not found'});
-        }
+       //  }
+        // else {
+        //     logger.info('User with id not found: %o', request.params.id);
+        //     response.status(404).json({message: 'User not found'});
+        // }
     }
     catch(error){
         logger.error('Error deleting user: %o', error);
