@@ -12,12 +12,14 @@ class EventsRepository {
     }
 
     async UpdateAsync(eventId, eventData){
-        const [rowsUpdated, [updatedEvent]] = await Events.update(eventData, {
-            where: {id:eventId},
-            returning : true
+        const [rowsUpdated] = await Events.update(eventData, {
+            where: {id:eventId}
         });
+        if(rowsUpdated>0){
+            return await this.GetByIdAsync(eventId);
+        }
 
-        return rowsUpdated ? updatedEvent:null;
+        return null;
     }
 
     async DeleteAsync(eventId){
