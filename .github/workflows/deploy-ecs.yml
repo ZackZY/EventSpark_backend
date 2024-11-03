@@ -51,6 +51,8 @@ env:
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_PORT: ${{ secrets.DB_PORT }}
 
+  ORIGIN: ${{ vars.ORIGIN }}
+
 permissions:
   contents: read
 
@@ -97,6 +99,7 @@ jobs:
           --build-arg DB_NAME=${{ env.DB_NAME }} \
           --build-arg DB_HOST=${{ env.DB_HOST }} \
           --build-arg DB_PORT=${{ env.DB_PORT }} \
+          --build-arg ORIGIN=${{ env.ORIGIN }} \
           -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
         docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
         echo "image=$REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
