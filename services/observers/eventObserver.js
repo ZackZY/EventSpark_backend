@@ -20,7 +20,7 @@ class EventObserver {
           logger.info(`No attendees found for ${event.id}`);
           return;
         }
-        for(const attendee of attendees) {
+        for(const attendee of attendees.filter(attendee => attendee.status === 'inviting')) {
           const user = await usersService.GetUserByIdAsync(attendee.attendeeId);
           logger.info(`Notifying ${user.email} for ${event.id}`);
           const uniqueId = `${attendee.eventAttendeeHash}`;

@@ -80,33 +80,50 @@ class EventsService {
 
     async AddAttendeesToEvent(eventId, attendeesData) {
         const transaction = await sequelize.transaction();
+        let event;
+        let userInstances;
         try{
-            const event = await EventsRepository.GetByIdAsync(eventId);
-            const userInstances = await Promise.all(
-                attendeesData.map(async (attendeeData) => {
-                    const [user, created] = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
-                    if(created){
-                        logger.info(`New user added: ${user.email}`);
-                    }
-                    else{
-                        logger.info(`Existing user: ${user.email}`);
-                    }
-                    return user;
-                })
-            );
+            event = await EventsRepository.GetByIdAsync(eventId);
 
-            // add created or updated users to event
-            await EventAttendeesRepository.addAttendeesToEvent(event, userInstances, transaction);
-            await transaction.commit();
-
-            // if events successfully created, send invite to all attendees using EventObserver
-            eventObserver.notify(event);
-            return userInstances.length();
-
+            if(event){
+                userInstances = await Promise.all(
+                    attendeesData.map(async (attendeeData) => {
+                        const [user, created] = await UsersRepository.findOrCreateByEmail(attendeeData, transaction);
+                        if(created){
+                            logger.info(`New user added: ${user.email}`);
+                        }
+                        else{
+                            logger.info(`Existing user: ${user.email}`);
+                        }
+                        return user;
+                    })
+                );
+                await transaction.commit();
+            }
+            else{
+                logger.info(`No event found for ${eventId}`);
+                return;
+            }
         }catch(error){
             await transaction.rollback();
             throw error;
         }
+
+        const transaction2 = await sequelize.transaction();
+        try{
+            // add created or updated users to event
+            await EventAttendeesRepository.addAttendeesToEvent(event, userInstances, transaction2);
+            transaction2.commit();
+            // if events successfully created, send invite to all attendees using EventObserver
+            eventObserver.notify(event);
+            return userInstances.length;
+        }
+        catch(error){
+            transaction2.rollback();
+            throw error;
+        }
+
+
     }
 
     async GetEventByUserIdAsync(userId){

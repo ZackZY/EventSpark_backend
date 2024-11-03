@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 'invited', // invited or registered or attended
+        defaultValue: 'inviting', // invited or registered or attended
       },
       eventAttendeeHash: {
         type: DataTypes.STRING,
