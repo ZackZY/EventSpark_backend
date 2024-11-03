@@ -100,7 +100,7 @@ async function ListAll(request, response, next){
 async function InviteUsersToEvent(request, response, next){
     try{
         const eventId = request.params.id;
-        const results = await EventsService.AddAttendeesToEvent(eventId, response.body);
+        const results = await EventsService.AddAttendeesToEvent(eventId, request.body.attendees);
         if(results > 0){
             logger.info(`${results} users invited`);
             response.status(200).json(results);

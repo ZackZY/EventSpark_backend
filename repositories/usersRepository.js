@@ -59,8 +59,8 @@ class UsersRepository {
         return await Users.findOrCreate({
             where: { email: attendeeData.email },
             defaults: {
-                name: attendeeData.name || NULL, // provide a name if available
-                contactnumber: attendeeData.contactNumber || NULL
+                name: attendeeData.name || null, // provide a name if available
+                contactnumber: attendeeData.contactNumber || null
             },
             transaction
         });
