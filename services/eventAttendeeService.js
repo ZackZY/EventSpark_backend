@@ -9,7 +9,7 @@ class EventAttendeesService {
     async RegisterAttendeeForEventAsync(eventId, userId){
         const transaction = await sequelize.transaction();
         try{
-            const result = EventAttendeesRepository.registerEvent(eventId, userId, transaction);
+            const result = await EventAttendeesRepository.registerEvent(eventId, userId, transaction);
             transaction.commit();
             if(result){
                 logger.info(`Register successful for ${eventId}-${userId}`);
@@ -24,6 +24,7 @@ class EventAttendeesService {
         }
         catch(error){
             transaction.rollback();
+            logger.error(`error registering for ${eventId}-${userId}: ${error}`);
             throw error;
         }
     }

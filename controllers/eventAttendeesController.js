@@ -23,10 +23,15 @@ async function RegisterForEvent(request,response, next){
         */
        const eventId = request.params.id;
        // update the user details
-       const updatedUser = await UsersService.UpdateUserAsync(user.id, request.body);
+       const updatedUser = await UsersService.FindOrCreateAndUpdateUserAsync(request.body);
 
+       if(!updatedUser){
+            logger.info(`User with id not found: ${request.body.id}`);
+            response.status(404).json({message: 'User not found'});
+            return;
+       }
        // register for event
-       EventAttendeesService.RegisterAttendeeForEventAsync(eventId, updatedUser.id);
+       await EventAttendeesService.RegisterAttendeeForEventAsync(eventId, updatedUser.id);
 
        if(success){
             logger.info('User with id deleted: %o', success);
