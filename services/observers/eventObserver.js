@@ -32,7 +32,7 @@ class EventObserver {
           We look forward to seeing you there!
           `;
           
-          const htmlEmailBody = `</p><p>You're invited to ${event.eventName}! Here’s your unique link to join:</p><a href="${attendeeLink}">Join Event</a><p>We look forward to seeing you there!</p>`
+          const htmlEmailBody = `</p><p>You're invited to ${event.eventName}! Here’s your unique link to join:</p><a href="${attendeeLink}">Join Event</a><p>We look forward to seeing you there!</p>`;
           const textBody = emailBody;
           const htmlBody = htmlEmailBody;
           await emailService.sendEmail(user.email, 'Event Invitation', textBody, htmlBody);
@@ -71,25 +71,46 @@ class EventObserver {
       }
     }
 
-    async notifyInvite(event, attendees){
-      attendees.forEach(async attendee => {
-        // get hash value to construct unique link
-        const eventAttendeeHash = await eventAttendeesRepository.getEventAttendeeHashAsync(event.id, attendee.id);
-        const uniqueId = `${eventAttendeeHash}`;
-        const attendeeLink = `https://ecs-frontend-lb-735742951.ap-southeast-1.elb.amazonaws.com/registerform.html?eventhash=${uniqueId}`;
-        const emailBody = `
-        You're invited to ${event.eventName}! Here’s your unique link to join:
-        ${attendeeLink}
-        
-        We look forward to seeing you there!
-        `;
-        
-        const htmlEmailBody = `</p><p>You're invited to ${event.eventName}! Here’s your unique link to join:</p><a href="${attendeeLink}">Join Event</a><p>We look forward to seeing you there!</p>`
-        const textBody = emailBody;
-        const htmlBody = htmlEmailBody;
-        await emailService.sendEmail(attendee.email, 'Event Invitation', textBody, htmlBody);
+    async notifyUpdate(event){
+      let attendees;
+      try{
+        attendees = await eventAttendeesRepository.getAttendeesByEventId(event.id);
 
-      });
+        if(attendees.length === 0) {
+          logger.info(`No attendees found for ${event.id}`);
+          return;
+        }else{
+          logger.info(`Notifying ${attendees.length} attendees for ${event.id}`);
+          attendees.forEach(async attendee => {
+            const user = await usersService.GetUserByIdAsync(attendee.attendeeId);
+            logger.info(`Notifying ${user.email} for ${event.id}`);
+            // get hash value to construct unique link
+            const emailBody = `
+            The details of ${event.eventName} has been updated!
+            Event Name: ${event.eventName}
+            Event Date: ${event.eventDate}
+            Event Time: ${event.eventTimeStart} to ${event.eventTimeEnd}
+            
+            We look forward to seeing you there!
+            `;
+            
+            const htmlEmailBody = `
+              <p>The details of ${event.eventName} have been updated!</p>
+              <p>Event Name: ${event.eventName}</p>
+              <p>Event Date: ${event.eventDate}</p>
+              <p>Event Time: ${event.eventTimeStart} to ${event.eventTimeEnd}</p>
+              <p>We look forward to seeing you there!</p>
+              `;
+            const textBody = emailBody;
+            const htmlBody = htmlEmailBody;
+            await emailService.sendEmail(user.email, 'Event Invitation', textBody, htmlBody);
+    
+          });
+        }
+      }catch(error){
+        logger.error(`Error notifying attendees: ${error}`);
+        throw error;
+      }
     }
 
     async generateQrCode(eventHash) {

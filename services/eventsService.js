@@ -15,7 +15,16 @@ class EventsService {
     }
 
     async UpdateEventAsync(eventId, eventData){
-        return await EventsRepository.UpdateAsync(eventId, eventData);
+        try{
+            const result = await EventsRepository.UpdateAsync(eventId, eventData);
+            if(result){
+                eventObserver.notifyUpdate(result);
+            }
+            return result;
+        }
+        catch(error){
+            throw error;
+        }
     }
 
     async DeleteEventAsync(eventId){
