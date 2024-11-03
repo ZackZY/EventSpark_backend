@@ -29,7 +29,7 @@ class EventObserver {
           const user = await usersService.GetUserByIdAsync(attendee.attendeeId);
           logger.info(`Notifying user ${user.email} for ${event.id}`);
           const uniqueId = `${attendee.eventAttendeeHash}`;
-          const attendeeLink = `https://ecs-frontend-lb-735742951.ap-southeast-1.elb.amazonaws.com/registerform.html?eventhash=${uniqueId}`;
+          const attendeeLink = `http://ecs-frontend-lb-735742951.ap-southeast-1.elb.amazonaws.com/registerEvent/register?eventhash=${uniqueId}`;
           const emailBody = `
           You're invited to ${event.eventName}! Here’s your unique link to join:
           ${attendeeLink}
