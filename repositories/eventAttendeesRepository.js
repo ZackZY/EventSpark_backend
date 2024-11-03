@@ -99,6 +99,19 @@ class EventAttendeesRepository {
       logger.info(`Register new attendee ${attendeeId} for event ${eventId}`);
       return await EventAttendees.create(attendeeData, { transaction });
     }
+
+    async UpdateAttendeeStatus(eventId, attendeeId, status, transaction){
+        const [rowsUpdated] = await EventAttendees.update({
+            status
+        },{
+            where:{
+                attendeeId,
+                eventId
+            }
+        }, { transaction }); 
+
+        return rowsUpdated > 0;
+    }
 }
 
 module.exports = new EventAttendeesRepository();

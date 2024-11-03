@@ -11,6 +11,7 @@ class EventObserver {
     }
   
     async notify(event) {
+      const transaction = await sequelize.transaction();
       try{      
         logger.info(`Getting attendees for ${event.id}`);
       
@@ -36,9 +37,12 @@ class EventObserver {
           const textBody = emailBody;
           const htmlBody = htmlEmailBody;
           await emailService.sendEmail(user.email, 'Event Invitation', textBody, htmlBody);
+          await eventAttendeesRepository.UpdateAttendeeStatus(event.id, attendee.id, 'invited',transaction);
         }
+        await transaction.commit();
       }
       catch(error){
+        await transaction.rollback();
         logger.error(`Error notifying attendees: ${error}`);
         throw error;
       }
