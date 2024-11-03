@@ -38,7 +38,8 @@ async function GetById(request, response){
 
 async function Update(request, response, next) {
     try {
-        const user = await UsersService.UpdateUserAsync(request.params.id, request.body);
+        const userData = request.body;
+        const user = await UsersService.UpdateUserAsync(request.params.id, {name: userData.name, contactNumber:userData.contactNumber});
         if(user) {
             logger.info('User with id updated: %o', user);
             response.status(200).json(user);
