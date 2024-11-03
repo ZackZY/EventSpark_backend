@@ -1,10 +1,20 @@
-FROM node:lts-alpine
-ENV NODE_ENV=production
+# Use Node.js 20 (Long Term Support) as base image
+FROM node:20-alpine
+
+# Set working directory
 WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
 COPY . .
-EXPOSE 3000
-RUN chown -R node /usr/src/app
-USER node
-CMD ["node", "app.js"]
+
+# Expose the port your app runs on
+EXPOSE 3001
+
+# Command to run the application
+CMD ["npm", "run", "local"]
