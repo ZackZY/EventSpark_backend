@@ -1,25 +1,28 @@
-const fs = require('fs');
-const { useInflection } = require('sequelize');
+require('dotenv').config();
 
 module.exports = {
   development: {
-    username: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'rootpassword',
-    database: process.env.DB_NAME || 'EventSpark',
-    host: process.env.DB_HOST || '127.0.0.1',
-    port: process.env.DB_PORT || 3306,
-    dialect: 'mysql',
-  },
-  test: {
-    username: process.env.CI_DB_USERNAME,
-    password: process.env.CI_DB_PASSWORD,
-    database: process.env.CI_DB_NAME,
+    username: 'root',
+    password: 'rootpassword',
+    database: 'EventSpark',
     host: '127.0.0.1',
-    port: 3306,
     dialect: 'mysql',
+    port: 3306
   },
   staging: {
-    use_env_variable: 'DATABASE_URL',
-    dialect: 'mysql',
+    username: process.env.DB_USER || 'test-User',
+    password: process.env.DB_PASSWORD || 'test-password',
+    database: process.env.DB_NAME || 'database_test',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT) || 3306,
+    dialect: 'mysql'
   },
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT) || 3306,
+    dialect: 'mysql'
+  }
 };

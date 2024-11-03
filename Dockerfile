@@ -1,6 +1,8 @@
 # Use Node.js 20 (Long Term Support) as base image
 FROM node:20-alpine
 
+ENV NODE_ENV=staging
+
 # Set working directory
 WORKDIR /code
 
