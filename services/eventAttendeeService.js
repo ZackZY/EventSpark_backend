@@ -13,8 +13,8 @@ class EventAttendeesService {
             transaction.commit();
             if(result){
                 logger.info(`Register successful for ${eventId}-${userId}`);
-                const event = EventsService.GetEventByIdAsync(eventId);
-                const user = UsersService.GetUserByIdAsync(userId);
+                const event = await EventsService.GetEventByIdAsync(eventId);
+                const user = await UsersService.GetUserByIdAsync(userId);
                 EventObserver.notifyConfirmation(event, user);
             }
             else{
@@ -24,7 +24,7 @@ class EventAttendeesService {
         }
         catch(error){
             transaction.rollback();
-            logger.error(`error registering for ${eventId}-${userId}: ${error}`);
+            logger.error(`error registering for ${eventId}-${userId}`);
             throw error;
         }
     }

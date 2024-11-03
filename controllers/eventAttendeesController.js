@@ -33,18 +33,12 @@ async function RegisterForEvent(request,response, next){
        // register for event
        await EventAttendeesService.RegisterAttendeeForEventAsync(eventId, updatedUser.id);
 
-       if(success){
-            logger.info('User with id deleted: %o', success);
-            response.status(200).json({message : 'User deleted'});
-        }
-        else {
-            logger.info('User with id not found: %o', request.params.id);
-            response.status(404).json({message: 'User not found'});
-        }
+        logger.info(`User registered: ${updatedUser.id} `);
+        response.status(200).json({message : 'User registered'});
     }
     catch(error){
-        logger.error('Error deleting user: %o', error);
-        //response.status(500).json({ message: 'Internal Server Error'});
+        logger.error(`Error registering user: ${error}`);
+        response.status(500).json({ message: 'Internal Server Error'});
         next(error);
     }
 }
