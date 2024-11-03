@@ -11,14 +11,14 @@ class UsersRepository {
     return await Users.findByPk(userId);
   }
 
-  async UpdateAsync(userId, userData) {
+  async UpdateAsync(userId, userData, transaction) {
     console.log(userId, userData);
 
     try {
       // Perform the update without returning the updated record
       const [rowsUpdated] = await Users.update(userData, {
         where: { id: userId },
-      });
+      }, {transaction});
 
       console.log("Rows updated:", rowsUpdated);
 
@@ -59,7 +59,9 @@ class UsersRepository {
         return await Users.findOrCreate({
             where: { email: attendeeData.email },
             defaults: {
-                name: attendeeData.name || '' // provide a name if available
+                name: attendeeData.name || NULL, // provide a name if available
+                contactnumber: attendeeData.contactNumber || NULL,
+                password: attendeeData.password || NULL,
             },
             transaction
         });
@@ -67,6 +69,15 @@ class UsersRepository {
 
     async GetEventByUserIdAsync(userId){
         return await Users.findByPk(userId, { include : Events });
+    }
+
+    async findOrCreateAndUpdateAsync(userData, transaction){
+      const existingUser = await this.findByEmail(userData.email);
+      if (existingUser) {
+        return await this.UpdateAsync(existingUser.id, userData, transaction);
+      } else {
+        return await this.findOrCreateByEmail(userData);
+      }
     }
 }
 

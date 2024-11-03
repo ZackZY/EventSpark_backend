@@ -1,4 +1,6 @@
 const UsersRepository = require('../repositories/usersRepository');
+const logger = require('../utils/logger');
+const { sequelize } = require('../db/models');
 
 class UsersService {
     async CreateUserAsync(data) {
@@ -19,6 +21,20 @@ class UsersService {
 
     async ListAllUsersAsync(){
         return await UsersRepository.ListAllAsync();
+    }
+
+    async FindOrCreateAndUpdateUserAsync(attendeeData){
+        const transaction = await sequelize.transaction();
+        let result;
+        try{
+            result = await UsersRepository.findOrCreateAndUpdateAsync(attendeeData, transaction);
+            transaction.commit();
+        }catch(error){
+            transaction.rollback();
+            logger.error(`Error creating or updating user: ${error}`);
+            throw error;
+        }
+        return result;
     }
 }
 

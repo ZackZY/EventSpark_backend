@@ -65,7 +65,7 @@ class EventAttendeesRepository {
       const attendee = await EventAttendees.findOne({
         where:{
           eventId: eventId,
-          userId:userId
+          attendeeId:userId
         }
       });
       return attendee ? attendee.eventAttendeeHash: null;
