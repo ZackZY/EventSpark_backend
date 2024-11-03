@@ -4,32 +4,45 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require('../../config/config')[env];
+const env = process.env.NODE_ENV || 'staging';
+const config = require('../../config/config.js');
 
 console.log('Current environment:', env);
+let activeConfig;
+switch (env) {
+  case 'production':
+    activeConfig = config.production;
+    break;
+  case 'staging':
+    activeConfig = config[env];
+    break;
+  case 'development':
+  default:
+    activeConfig = config.development;
+    break;
+}
 console.log('Loaded database config:', {
-    host: config.host,
-    port: config.port,
-    database: config.database,
-    username: config.username,
-    dialect: config.dialect
+    host: activeConfig.host,
+    port: activeConfig.port,
+    database: activeConfig.database,
+    username: activeConfig.username,
+    dialect: activeConfig.dialect
 });
 
 const db = {};
 
 let sequelize;
-if (config.use_env_variable) {
-    sequelize = new Sequelize(process.env[config.use_env_variable], config);
+if (activeConfig.use_env_variable) {
+    sequelize = new Sequelize(process.env[activeConfig.use_env_variable], activeConfig);
 } else {
     sequelize = new Sequelize(
-        config.database,
-        config.username,
-        config.password,
+        activeConfig.database,
+        activeConfig.username,
+        activeConfig.password,
         {
-            host: config.host,
-            port: config.port,
-            dialect: config.dialect,
+            host: activeConfig.host,
+            port: activeConfig.port,
+            dialect: activeConfig.dialect,
             logging: console.log
         }
     );
