@@ -47,25 +47,29 @@ class EventObserver {
       const eventAttendeeHash = await eventAttendeesRepository.getEventAttendeeHashAsync(event.id, attendee.id);
       if(eventAttendeeHash){
         logger.info(`Sending confirmation for ${eventAttendeeHash}`);
-        const qrCodeImageUrl = await qrcode.toDataURL(eventAttendeeHash, {
-          errorCorrectionLevel: 'H',
-          type: 'image/png',
-          width: 100,
-          height: 100,
-        });
+
         const emailBody = `
-          Please check in your attendance to ${event.eventName}:
-          <img src="data:image/png;base64,${qrCodeImageUrl}" width="100" height="100">
+          Please check in your attendance to ${event.eventName}
           We look forward to seeing you there!
+          <img src="cid:qrcode" alt="Event QR Code" />
         `;
 
         const htmlEmailBody = `
           <p>Please check in your attendance to ${event.eventName}:</p>
-          <img src="data:image/png;base64,${qrCodeImageUrl}" width="100" height="100">
           <p>We look forward to seeing you there!</p>
+          <img src="cid:qrcode" alt="Event QR Code" />
         `;
-
-        await emailService.sendEmail(attendee.email, 'Event Check In QR CODE', emailBody, htmlEmailBody);
+        const qrCodeBuffer = await this.generateQrCodeAndSave(eventAttendeeHash);
+        
+        logger.info(`QR Code URL: ${qrCodeBuffer}`);
+        const attachment = {
+          Content: qrCodeBuffer,
+          Name: 'QRCode.png',
+          ContentType: 'image/png',
+          ContentDisposition: 'inline',
+          ContentID: 'qrcode'
+        }
+        await emailService.sendEmail(attendee.email, 'Event Check In QR CODE', emailBody, htmlEmailBody, attachment);
       }
     }
 
@@ -89,6 +93,28 @@ class EventObserver {
 
       });
     }
+
+    async generateQrCode(eventHash) {
+      try {
+          const url = `${eventHash}`;
+          const qrCodeDataUrl = await qrcode.toDataURL(url);
+          return qrCodeDataUrl; // Returns a base64-encoded image
+      } catch (error) {
+          console.error("Error generating QR Code:", error);
+          throw error; // Re-throw the error for further handling
+      }
+    }
+
+    async generateQrCodeAndSave(eventHash) {
+      try {
+          const qrCodeDataUrl = await this.generateQrCode(eventHash);
+          const base64Data = qrCodeDataUrl.replace(/^data:image\/png;base64,/, "");
+          const qrCodeBuffer = Buffer.from(base64Data, 'base64');
+          return qrCodeBuffer;
+      } catch (error) {
+          console.error("Error saving QR Code:", error);
+      }
+    } 
   }
 
 module.exports = new EventObserver();

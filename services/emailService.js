@@ -12,18 +12,23 @@ const ses = new SESClient({
 });
 
 class EmailService {
-    async sendEmail(to, subject, textBody, htmlBody) {
+    async sendEmail(to, subject, textBody, htmlBody, attachment = null) {
         const params = {
             Destination: { ToAddresses: [to] },
             Message: {
                 Body: {
-                    Text: { Data: textBody },
+                    //Text: { Data: textBody },
                     Html: { Data: htmlBody },
                 },
                 Subject: { Data: subject },
             },
             Source: 'noreply.eventspark@gmail.com',
         };
+        if(attachment){
+            params.Message.Body.Attachments = [
+                attachment
+            ];
+        }
         try{
             const command = new SendEmailCommand(params);
             await ses.send(command); //(params).promise();
