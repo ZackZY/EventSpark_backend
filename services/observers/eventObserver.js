@@ -4,13 +4,16 @@ const emailService = require("../emailService");
 const qrcode = require('qrcode');
 const usersService = require("../usersService");
 const uploadService = require("../uploadService");
+const { sequelize } = require('../../db/models');
 
 // EventObserver.js
 class EventObserver {
     constructor() {
+      logger.info(`EventObserver initialized`);
     }
   
     async notify(event) {
+      logger.info(`Event Observer Notifying ${event.id}`);
       const transaction = await sequelize.transaction();
       try{      
         logger.info(`Getting attendees for ${event.id}`);
@@ -22,8 +25,9 @@ class EventObserver {
           return;
         }
         for(const attendee of attendees.filter(attendee => attendee.status === 'inviting')) {
+          logger.info(`Notifying attendee id ${attendee.attendeeId} for ${event.id}`);
           const user = await usersService.GetUserByIdAsync(attendee.attendeeId);
-          logger.info(`Notifying ${user.email} for ${event.id}`);
+          logger.info(`Notifying user ${user.email} for ${event.id}`);
           const uniqueId = `${attendee.eventAttendeeHash}`;
           const attendeeLink = `https://ecs-frontend-lb-735742951.ap-southeast-1.elb.amazonaws.com/registerform.html?eventhash=${uniqueId}`;
           const emailBody = `
@@ -37,7 +41,7 @@ class EventObserver {
           const textBody = emailBody;
           const htmlBody = htmlEmailBody;
           await emailService.sendEmail(user.email, 'Event Invitation', textBody, htmlBody);
-          await eventAttendeesRepository.UpdateAttendeeStatus(event.id, attendee.id, 'invited',transaction);
+          await eventAttendeesRepository.UpdateAttendeeStatus(event.id, user.id, 'invited',transaction);
         }
         await transaction.commit();
       }

@@ -3,6 +3,7 @@ const logger = require('../utils/logger');
 // const path = require('path');
 // const env = process.env.NODE_ENV || 'development';
 // const config = require(path.join(__dirname, '../../config/config.json'))[env];
+logger.info(`Using AWS access key: ${process.env.AWS_ACCESS_KEY_ID}`);
 const ses = new SESClient({ 
     region: 'ap-southeast-1',  
     credentials:{
