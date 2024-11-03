@@ -26,7 +26,7 @@ class EventsRepository {
     }
 
     async ListAllAsync() {
-        return await Events.findAll({ where: {eventType:'Public'}});
+        return await Events.findAll();
     }
 
     async GetEventWithAttendeesAsync(eventId){
