@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../utils/asyncHandler');
 const logger = require('../utils/logger');
-const { mapCreateEventRequestToModel } = require('../utils/modelmapper');
+const { mapCreateEventRequestToModel, mapEventUpdateBody } = require('../utils/modelmapper');
 
 async function Create(request, response, next) {
     try {
@@ -42,7 +42,8 @@ async function GetById(request, response, next){
 
 async function Update(request, response, next) {
     try {
-        const event = await EventsService.UpdateEventAsync(request.params.id, request.body);
+        const mappedRequestBody = mapEventUpdateBody(request.body);
+        const event = await EventsService.UpdateEventAsync(request.params.id, mappedRequestBody);
         if(event) {
             logger.info('Event with id updated: %o', event);
             response.status(200).json(event);
