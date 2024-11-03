@@ -9,7 +9,16 @@ class EventAttendeesService {
     async RegisterAttendeeForEventAsync(eventId, userId){
         const transaction = await sequelize.transaction();
         try{
-            const result = await EventAttendeesRepository.registerEvent(eventId, userId, transaction);
+            logger.info(`Registering attendee ${userId} for event ${eventId}`);
+            const eventHash = await EventAttendeesRepository.getEventAttendeeHashAsync(eventId, userId);
+            let result;
+            if(eventHash){
+                result = await EventAttendeesRepository.registerEvent(eventId, userId, transaction);
+            }
+            else{
+                // new event attendee
+                result = await EventAttendeesRepository.registerNewAttendeeToEvent(eventId, userId, transaction);
+            }
             transaction.commit();
             if(result){
                 logger.info(`Register successful for ${eventId}-${userId}`);

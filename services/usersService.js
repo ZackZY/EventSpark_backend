@@ -27,14 +27,14 @@ class UsersService {
         const transaction = await sequelize.transaction();
         let result;
         try{
-            result = await UsersRepository.findOrCreateAndUpdateAsync(attendeeData, transaction);
+            await UsersRepository.findOrCreateAndUpdateAsync(attendeeData, transaction);
             transaction.commit();
         }catch(error){
             transaction.rollback();
             logger.error(`Error creating or updating user: ${error}`);
             throw error;
         }
-        return result;
+        return await UsersRepository.findByEmail(attendeeData.email);
     }
 }
 

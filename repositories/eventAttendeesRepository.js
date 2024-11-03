@@ -84,6 +84,23 @@ class EventAttendeesRepository {
 
       return rowsUpdated > 0;
     }
+
+    async registerNewAttendeeToEvent(eventId, attendeeId, transaction){
+      const eventAttendeeHash = `${eventId}-${attendeeId}`;
+      const attendeeData = {
+        attendeeId: attendeeId,
+        eventId: eventId,
+        dateTimeRegistered: new Date(),
+        status: 'registered',
+        eventAttendeeHash,
+        typeOfAttendee: 'attendee',
+        dateTimeInvited: new Date(),
+        dateTimeAttended: null
+      };
+
+      logger.info(`Register new attendee ${attendeeId} for event ${eventId}`);
+      return await EventAttendees.create(attendeeData, { transaction });
+    }
 }
 
 module.exports = new EventAttendeesRepository();
