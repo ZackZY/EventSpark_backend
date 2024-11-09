@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "local": "npm install && node app.js --port 3001"
   },
   "keywords": [],
