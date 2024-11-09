@@ -9,7 +9,19 @@ jest.mock('../repositories/eventsRepository'); // Mock the EventsRepository
 jest.mock('../repositories/usersRepository'); // Mock the UsersRepository
 jest.mock('../repositories/eventAttendeesRepository') // mock the EventAttendeesRepository
 jest.mock('../services/observers/eventObserver');
-
+jest.mock('../db/models/index', () => ({
+    sequelize: {
+      transaction: jest.fn()
+    },
+    Users: jest.fn(),  // Changed this line to avoid circular dependency
+    Events: {
+        create: jest.fn(),
+        findByPk: jest.fn(),
+        update: jest.fn(),
+        destroy: jest.fn(),
+        findAll: jest.fn()
+    }
+  }));
 describe('EventsService', () => {
     // Sample data for testing
     const sampleEvent = {
@@ -26,14 +38,14 @@ describe('EventsService', () => {
         updatedAt: new Date(),
     };
     beforeEach(() => {
-        jest.clearAllMocks(); // Clear previous calls and instances
-
+        
         mockTransaction = {
             commit: jest.fn(),
             rollback: jest.fn(),
         };
 
         sequelize.transaction = jest.fn().mockResolvedValue(mockTransaction);
+        jest.clearAllMocks(); // Clear previous calls and instances
     });
 
     test('should create an event', async () => {
@@ -47,12 +59,11 @@ describe('EventsService', () => {
 
     test('should get an event by id', async () => {
         const eventId = sampleEvent.id;
-        const eventData = { sampleEvent };
-        EventsRepository.GetEventWithAttendeesAsync.mockResolvedValue(eventData); // Mock the GetById method
+        EventsRepository.GetByIdAsync.mockResolvedValue(sampleEvent);
 
         const result = await EventsService.GetEventByIdAsync(eventId);
-        expect(result).toEqual(eventData); // Assert the returned data is correct
-        expect(EventsRepository.GetEventWithAttendeesAsync).toHaveBeenCalledWith(eventId); // Check if the repository method was called correctly
+        expect(result).toEqual(sampleEvent);
+        expect(EventsRepository.GetByIdAsync).toHaveBeenCalledWith(eventId);
     });
 
     test('should update an event', async () => {
@@ -158,7 +169,7 @@ describe('EventsService', () => {
         eventObserver.notify.mockResolvedValue();
     
         // Call the method
-        await EventsService.addAttendeesToEvent(eventId, attendeesData);
+        await EventsService.AddAttendeesToEvent(eventId, attendeesData);
     
         // Assertions
         expect(EventsRepository.GetByIdAsync).toHaveBeenCalledWith(eventId);

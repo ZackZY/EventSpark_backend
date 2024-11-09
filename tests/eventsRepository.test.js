@@ -3,9 +3,23 @@
 const Events = require('../db/models').Events; // Assuming your Sequelize index file exports the models
 const Users = require('../db/models').Users;
 const EventsRepository = require('../repositories/eventsRepository');
-
+const sequelize = require('../db/models/index').sequelize;
 // Mock the Events model using Jest
 jest.mock('../db/models');
+// Add this mock before your describe block
+jest.mock('../db/models/index', () => ({
+    sequelize: {
+      transaction: jest.fn()
+    },
+    Users: jest.fn(),  // Changed this line to avoid circular dependency
+    Events: {
+        create: jest.fn(),
+        findByPk: jest.fn(),
+        update: jest.fn(),
+        destroy: jest.fn(),
+        findAll: jest.fn()
+    }
+  }));
 
 describe('EventsRepository', () => {
     // Sample data for testing
@@ -29,6 +43,7 @@ describe('EventsRepository', () => {
     };
 
     beforeEach(() => {
+        sequelize.transaction = jest.fn().mockResolvedValue(mockTransaction);
         jest.clearAllMocks(); // Clear mock history before each test
     });
 
@@ -59,15 +74,16 @@ describe('EventsRepository', () => {
         const updatedData = { eventName: 'Tech Meetup' };
         const updatedEvent = { ...sampleEvent, ...updatedData };
 
-        // Mock the update method to return an array [numberOfAffectedRows, [updatedEvent]]
-        Events.update.mockResolvedValue([1, [updatedEvent]]);
+        // Mock the update method to return an array with number of affected rows
+        Events.update.mockResolvedValue([1]);
+        // Mock findByPk to return the updated event
+        Events.findByPk.mockResolvedValue(updatedEvent);
 
         const result = await EventsRepository.UpdateAsync(sampleEvent.id, updatedData);
 
         // Assertions
         expect(Events.update).toHaveBeenCalledWith(updatedData, {
-            where: { id: sampleEvent.id },
-            returning: true,
+            where: { id: sampleEvent.id }
         });
         expect(result).toEqual(updatedEvent);
     });
@@ -127,5 +143,20 @@ describe('EventsRepository', () => {
         expect(result.Users).toHaveLength(2); // Check that it includes 2 associated users
         expect(result.Users[0].name).toBe('John');
         expect(result.Users[1].name).toBe('Jane');
+    });
+
+    test('should return null when updating non-existent event', async () => {
+        const updatedData = { eventName: 'Tech Meetup' };
+        
+        // Mock update to return [0] indicating no rows were updated
+        Events.update.mockResolvedValue([0]);
+
+        const result = await EventsRepository.UpdateAsync('non-existent-id', updatedData);
+
+        // Assertions
+        expect(Events.update).toHaveBeenCalledWith(updatedData, {
+            where: { id: 'non-existent-id' }
+        });
+        expect(result).toBeNull();
     });
 });

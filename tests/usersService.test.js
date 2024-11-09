@@ -1,8 +1,19 @@
 const UsersService = require('../services/usersService');
 const UsersRepository = require('../repositories/usersRepository');
-
+const sequelize = require('../db/models/index').sequelize;
+const Users = require('../db/models').Users;
 jest.mock('../repositories/usersRepository'); // Mock the UsersRepository
+// Mock the Users model using Jest
+jest.mock("../db/models");
 
+// Add this mock before your describe block
+jest.mock('../db/models/index', () => ({
+  sequelize: {
+    transaction: jest.fn()
+  },
+  Users: jest.fn(),  // Changed this line to avoid circular dependency
+  Events: jest.fn()
+}));
 describe('UsersService', () => {
     // Sample data for testing
     const sampleUser = {
@@ -14,7 +25,24 @@ describe('UsersService', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
     };
+
+    let mockTransaction;
     beforeEach(() => {
+        // Setup mock methods for Users
+        Users.create = jest.fn();
+        Users.findByPk = jest.fn();
+        Users.update = jest.fn();
+        Users.findOne = jest.fn();
+        Users.destroy = jest.fn();
+        Users.findAll = jest.fn();
+        Users.findOrCreate = jest.fn();
+
+        mockTransaction = {
+          commit: jest.fn(),
+          rollback: jest.fn(),
+        };
+
+        sequelize.transaction = jest.fn().mockResolvedValue(mockTransaction);
         jest.clearAllMocks(); // Clear previous calls and instances
     });
 
@@ -64,5 +92,44 @@ describe('UsersService', () => {
         const result = await UsersService.ListAllUsersAsync();
         expect(result).toEqual(users); // Assert the returned users match the mock
         expect(UsersRepository.ListAllAsync).toHaveBeenCalled(); // Ensure the repository method was called
+    });
+
+    test('should find or create and update user', async () => {
+        const attendeeData = {
+            email: 'purple@cactus.com',
+            name: 'purple cactus'
+        };
+        
+        // Mock the repository methods
+        UsersRepository.findOrCreateAndUpdateAsync.mockResolvedValue(sampleUser);
+        UsersRepository.findByEmail.mockResolvedValue(sampleUser);
+
+        const result = await UsersService.FindOrCreateAndUpdateUserAsync(attendeeData);
+        
+        // Verify the result
+        expect(result).toEqual(sampleUser);
+        
+        // Verify the transaction flow
+        expect(sequelize.transaction).toHaveBeenCalled();
+        expect(UsersRepository.findOrCreateAndUpdateAsync).toHaveBeenCalledWith(attendeeData, mockTransaction);
+        expect(mockTransaction.commit).toHaveBeenCalled();
+        expect(mockTransaction.rollback).not.toHaveBeenCalled();
+        expect(UsersRepository.findByEmail).toHaveBeenCalledWith(attendeeData.email);
+    });
+
+    test('should handle errors in find or create and update user', async () => {
+        const attendeeData = {
+            email: 'purple@cactus.com',
+            name: 'purple cactus'
+        };
+        
+        // Mock the repository method to throw an error
+        const error = new Error('Database error');
+        UsersRepository.findOrCreateAndUpdateAsync.mockRejectedValue(error);
+
+        // Verify that the error is thrown and transaction is rolled back
+        await expect(UsersService.FindOrCreateAndUpdateUserAsync(attendeeData)).rejects.toThrow(error);
+        expect(mockTransaction.rollback).toHaveBeenCalled();
+        expect(mockTransaction.commit).not.toHaveBeenCalled();
     });
 });

@@ -4,13 +4,21 @@ const request = require('supertest');
 const express = require('express');
 const eventsRouter = require('../controllers/eventsController'); // Import the updated router
 const EventsService = require('../services/eventsService'); // Import the service to mock
-
+const sequelize = require('../db/models/index').sequelize;
 // Mock the EventService module
 jest.mock('../services/eventsService');
 
 const app = express();
 app.use(express.json()); // Use JSON middleware
 app.use('/api', eventsRouter); // Use the events router on the /api path
+// Add this mock before your describe block
+jest.mock('../db/models/index', () => ({
+    sequelize: {
+      transaction: jest.fn()
+    },
+    Users: jest.fn(),  // Changed this line to avoid circular dependency
+    Events: jest.fn()
+  }));
 
 describe('EventsController', () => {
     // Sample data for testing
@@ -33,6 +41,16 @@ describe('EventsController', () => {
                 { "email": "alice.johnson@example.com" }
             ]
     };
+
+    beforeEach(() => {
+        mockTransaction = {
+          commit: jest.fn(),
+          rollback: jest.fn(),
+        };
+    
+        sequelize.transaction = jest.fn().mockResolvedValue(mockTransaction);
+        jest.clearAllMocks(); // Clear mock history before each test
+      });
 
     test('should create a new event', async () => {
         const newEvent = { sampleEvent };
