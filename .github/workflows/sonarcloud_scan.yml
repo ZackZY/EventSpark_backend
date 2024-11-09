@@ -1,19 +1,10 @@
 name: SonarCloud Analysis
 on:
-  # For pull requests
   pull_request:
     types: [opened, synchronize, reopened]
-  # For reusable workflow
-  workflow_call:
-    secrets:
-      SONAR_TOKEN:
-        required: true
-      GITHUB_TOKEN:
-        required: true
-
 jobs:
   sonarcloud:
-    name: Jest & SonarCloud
+    name: SonarCloud
     runs-on: ubuntu-latest
     permissions: # Add these permissions
       security-events: write
@@ -24,10 +15,8 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install dependencies
         run: npm install
-      
       - name: Run tests with coverage
         run: npm run test:coverage
-      
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

@@ -57,18 +57,28 @@ permissions:
   contents: read
 
 jobs:
-  code_quality:
-    name: Code Quality Check
-    uses: ./.github/workflows/sonarcloud_scan.yml
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  sonarcloud:
+    name: Jest & SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests with coverage
+        run: npm run test:coverage
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   buildANDpushECR:
     name: Docker Build and Push
     runs-on: ubuntu-latest
     environment: production
-    needs: code_quality
+    needs: sonarcloud
     outputs:
       image: ${{ steps.build-image.outputs.image }}
 
