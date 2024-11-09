@@ -5,7 +5,7 @@ on:
     # Runs every day at 01:00 Singapore Standard Time (SGT)
     - cron: '0 17 * * *'
   workflow_run:
-    workflows: [SonarCloud Analysis]
+    workflows: [Deploy to Amazon ECS]
     types:
       - completed
   workflow_dispatch:
