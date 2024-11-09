@@ -58,7 +58,7 @@ permissions:
 
 jobs:
   sonarcloud:
-    name: SonarCloud Scan
+    name: Jest & SonarCloud Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
